@@ -14,4 +14,10 @@
    limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess.EntityFramework.Base\DataAccess.EntityFramework.Base.csproj" />
+  </ItemGroup>
 </Project>

@@ -14,33 +14,29 @@
    limitations under the License.
 -->
 <Solution>
-  <Folder Name="/Base/">
+  <Folder Name="/01_Base/">
     <Project Path="DataAccess.Base.Unit.Tests/DataAccess.Base.Unit.Tests.csproj" />
     <Project Path="DataAccess.Base/DataAccess.Base.csproj" />
   </Folder>
-  <Folder Name="/EF.Base/">
+  <Folder Name="/02_EF.Base/">
     <Project Path="DataAccess.EntityFramework.Base.Unit.Tests/DataAccess.EntityFramework.Base.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.Base/DataAccess.EntityFramework.Base.csproj" />
   </Folder>
-  <Folder Name="/EF.Design/">
-    <Project Path="DataAccess.EntityFramework.Design.Unit.Tests/DataAccess.EntityFramework.Design.Unit.Tests.csproj" />
-    <Project Path="DataAccess.EntityFramework.Design/DataAccess.EntityFramework.Design.csproj" />
-  </Folder>
-  <Folder Name="/EF.PostgreSQL/">
-    <Project Path="DataAccess.EntityFramework.PostgreSQL.Unit.Tests/DataAccess.EntityFramework.PostgreSQL.Unit.Tests.csproj" />
-    <Project Path="DataAccess.EntityFramework.PostgreSQL/DataAccess.EntityFramework.PostgreSQL.csproj" />
-  </Folder>
-  <Folder Name="/EF.Relational/">
+  <Folder Name="/03_EF.Relational/">
     <Project Path="DataAccess.EntityFramework.Relational.Unit.Tests/DataAccess.EntityFramework.Relational.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.Relational/DataAccess.EntityFramework.Relational.csproj" />
   </Folder>
-  <Folder Name="/EF.SQLite/">
-    <Project Path="DataAccess.EntityFramework.SQLite.Unit.Tests/DataAccess.EntityFramework.SQLite.Unit.Tests.csproj" />
-    <Project Path="DataAccess.EntityFramework.SQLite/DataAccess.EntityFramework.SQLite.csproj" />
-  </Folder>
-  <Folder Name="/EF.SqlServer/">
+  <Folder Name="/04_EF.SqlServer/">
     <Project Path="DataAccess.EntityFramework.SqlServer.Unit.Tests/DataAccess.EntityFramework.SqlServer.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.SqlServer/DataAccess.EntityFramework.SqlServer.csproj" />
+  </Folder>
+  <Folder Name="/05_EF.PostgreSQL/">
+    <Project Path="DataAccess.EntityFramework.PostgreSQL.Unit.Tests/DataAccess.EntityFramework.PostgreSQL.Unit.Tests.csproj" />
+    <Project Path="DataAccess.EntityFramework.PostgreSQL/DataAccess.EntityFramework.PostgreSQL.csproj" />
+  </Folder>
+  <Folder Name="/06_EF.SQLite/">
+    <Project Path="DataAccess.EntityFramework.SQLite.Unit.Tests/DataAccess.EntityFramework.SQLite.Unit.Tests.csproj" />
+    <Project Path="DataAccess.EntityFramework.SQLite/DataAccess.EntityFramework.SQLite.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />

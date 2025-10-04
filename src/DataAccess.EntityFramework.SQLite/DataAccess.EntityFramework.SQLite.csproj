@@ -14,4 +14,11 @@
    limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess.EntityFramework.Relational\DataAccess.EntityFramework.Relational.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
 </Project>
