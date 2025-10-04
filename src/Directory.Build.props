@@ -1,0 +1,43 @@
+<!--
+   Copyright 2025 Alexander Stärk
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<Project>
+  <!-- general build properties -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+  </PropertyGroup>
+  
+  <!-- NuGet package properties and project info -->
+  <PropertyGroup>
+    <BAS_CB_Copyright_BeginYear>2025</BAS_CB_Copyright_BeginYear>
+    <PackageProjectUrl>https://github.com/basilisque-framework/DataAccess</PackageProjectUrl>
+    <PackageTags>DataAccess Data Access EF Entity Framework EntityFramework CSharp</PackageTags>
+    <!--<PackageIconUrl>http://www.url.de/nuget_icon.png</PackageIconUrl>-->
+    <PackageReadmeFile>docs\README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- common build configuration for non-test projects -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) != 'true'">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(MSBuildProjectName).Unit.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
+  <!-- common build configuration for unit test projects -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Unit.Tests'))">
+    <ProjectReference Include="..\$(MSBuildProjectName.Replace('.Unit.Tests', ''))\$(MSBuildProjectName.Replace('.Unit.Tests', '')).csproj" />
+  </ItemGroup>
+</Project>
