@@ -90,6 +90,12 @@ public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFr
     protected virtual void OnAfterModelCreating(ModelBuilder modelBuilder)
     { /* for overriding purposes only */ }
 
+    /// <inheritdoc />
+    protected override void AddDesignTimeModelDbScriptsConvention(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Add(sp => new DbScripts.ModelDbScriptsConvention<TDbContext>(this));
+    }
+
     private void prefixTableNames(ModelBuilder modelBuilder)
     {
         var appArea = GetAppAreaPrefix();
