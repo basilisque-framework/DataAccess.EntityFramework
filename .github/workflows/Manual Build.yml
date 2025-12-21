@@ -36,6 +36,7 @@ jobs:
     uses: basilisque-framework/CommonBuild/.github/workflows/Common-Build.yml@release/v1.0
     with:
       basBuildType: ${{ inputs.basBuildTypeChoice }}
+      projectOrSolution: 'src/Basilisque.DataAccess.slnx'
       publishTargetFramework: 'netstandard2.0'
       sonarProjectKey: 'basilisque-framework_DataAccess'
       sonarOrganization: 'basilisque-framework'
