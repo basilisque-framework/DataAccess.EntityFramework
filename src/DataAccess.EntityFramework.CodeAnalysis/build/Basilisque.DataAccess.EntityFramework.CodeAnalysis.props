@@ -1,4 +1,4 @@
-﻿<!--
+<!--
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,20 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <BAS_DA_AddCodeAnalysisDependency>true</BAS_DA_AddCodeAnalysisDependency>
-  </PropertyGroup>
-
+<Project>
   <ItemGroup>
-    <ProjectReference Include="..\DataAccess.EntityFramework.Relational\DataAccess.EntityFramework.Relational.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="build/**" Pack="true" PackagePath="build" />
+    <CompilerVisibleProperty Include="BAS_DA_EF_IsMigrationAssembly" />
+    <CompilerVisibleProperty Include="BAS_DA_EF_DesignTimeDbContextFactories" />
   </ItemGroup>
 </Project>

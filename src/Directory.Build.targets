@@ -14,4 +14,16 @@
    limitations under the License.
 -->
 <Project>
+  <!-- Create a NuGet package reference between projects with BAS_DA_AddCodeAnalysisDependency=true and the source generator. But do not execute the source generator in those projects. -->
+  <ItemGroup Condition="'$(BAS_DA_AddCodeAnalysisDependency)' == 'true'">
+    <!-- Reference the code analysis project to create a dependency between the NuGet packages -->
+    <ProjectReference Include="..\DataAccess.EntityFramework.CodeAnalysis\DataAccess.EntityFramework.CodeAnalysis.csproj" PrivateAssets="Compile;runtime;contentFiles" />
+  </ItemGroup>
+  <Target Name="DisableOwnSourceGenerator" BeforeTargets="CoreCompile" Condition="'$(BAS_DA_AddCodeAnalysisDependency)' == 'true'">
+    <!-- Do not execute the DataAccess.EntityFramework.CodeAnalysis source generator in the project -->
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Filename)').Contains('DataAccess.EntityFramework.CodeAnalysis'))" />
+      <Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Filename)').Contains('Basilisque.CodeAnalysis'))" />
+    </ItemGroup>
+  </Target>
 </Project>

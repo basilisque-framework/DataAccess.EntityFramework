@@ -26,15 +26,19 @@
     <Project Path="DataAccess.EntityFramework.Relational.Unit.Tests/DataAccess.EntityFramework.Relational.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.Relational/DataAccess.EntityFramework.Relational.csproj" />
   </Folder>
-  <Folder Name="/04_EF.SqlServer/">
+  <Folder Name="/04_CodeAnalysis/">
+    <Project Path="DataAccess.EntityFramework.CodeAnalysis.Tests/DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.csproj" />
+    <Project Path="DataAccess.EntityFramework.CodeAnalysis/DataAccess.EntityFramework.CodeAnalysis.csproj" />
+  </Folder>
+  <Folder Name="/05_EF.SqlServer/">
     <Project Path="DataAccess.EntityFramework.SqlServer.Unit.Tests/DataAccess.EntityFramework.SqlServer.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.SqlServer/DataAccess.EntityFramework.SqlServer.csproj" />
   </Folder>
-  <Folder Name="/05_EF.PostgreSQL/">
+  <Folder Name="/06_EF.PostgreSQL/">
     <Project Path="DataAccess.EntityFramework.PostgreSQL.Unit.Tests/DataAccess.EntityFramework.PostgreSQL.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.PostgreSQL/DataAccess.EntityFramework.PostgreSQL.csproj" />
   </Folder>
-  <Folder Name="/06_EF.SQLite/">
+  <Folder Name="/07_EF.SQLite/">
     <Project Path="DataAccess.EntityFramework.SQLite.Unit.Tests/DataAccess.EntityFramework.SQLite.Unit.Tests.csproj" />
     <Project Path="DataAccess.EntityFramework.SQLite/DataAccess.EntityFramework.SQLite.csproj" />
   </Folder>

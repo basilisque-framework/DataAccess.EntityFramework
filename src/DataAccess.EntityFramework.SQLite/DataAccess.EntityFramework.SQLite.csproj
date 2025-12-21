@@ -14,11 +14,19 @@
    limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <BAS_DA_AddCodeAnalysisDependency>true</BAS_DA_AddCodeAnalysisDependency>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\DataAccess.EntityFramework.Relational\DataAccess.EntityFramework.Relational.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
   </ItemGroup>
 </Project>

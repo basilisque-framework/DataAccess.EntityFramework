@@ -1,4 +1,4 @@
-﻿<!--
+﻿/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,18 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
--->
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <BAS_DA_AddCodeAnalysisDependency>true</BAS_DA_AddCodeAnalysisDependency>
-  </PropertyGroup>
+*/
 
-  <ItemGroup>
-    <ProjectReference Include="..\DataAccess.EntityFramework.Relational\DataAccess.EntityFramework.Relational.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-  </ItemGroup>
+namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators;
 
-  <ItemGroup>
-    <None Include="build/**" Pack="true" PackagePath="build" />
-  </ItemGroup>
-</Project>
+internal readonly struct BuildPropertyInfo
+{
+    public BuildPropertyInfo(bool isMigrationAssembly, string[]? designTimeDbContextFactories)
+    {
+        IsMigrationAssembly = isMigrationAssembly;
+        DesignTimeDbContextFactories = designTimeDbContextFactories;
+    }
+
+    public bool IsMigrationAssembly { get; }
+    public string[]? DesignTimeDbContextFactories { get; }
+}

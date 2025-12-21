@@ -36,11 +36,11 @@ namespace Basilisque.DataAccess.EntityFramework.SQLite.Design;
 ///     for more information and examples.
 /// </remarks>
 /// <typeparam name="TDbContext">The type of the context.</typeparam>
-public abstract class SQLiteBaseDesignTimeDbContextFactory<TDbContext> : BaseDesignTimeDbContextFactory<TDbContext>
+public class SQLiteBaseDesignTimeDbContextFactory<TDbContext> : BaseDesignTimeDbContextFactory<TDbContext>
     where TDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     /// <inheritdoc />
-    protected sealed override void ConfigureProviderServices(IServiceCollection services)
+    public sealed override void ConfigureProviderServices(IServiceCollection services, string[] args, bool isChildFactory)
     {
         services.AddKeyedSingleton<IDbProviderInfo, SQLiteDbProviderInfo>(SQLiteDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IDbContextOptionsConfigurator, SQLiteDbContextOptionsConfigurator>(SQLiteDbProviderInfo.ProviderKeyName);

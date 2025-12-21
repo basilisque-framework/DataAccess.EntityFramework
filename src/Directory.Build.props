@@ -16,8 +16,9 @@
 <Project>
   <!-- general build properties -->
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <UseArtifactsOutput>true</UseArtifactsOutput>
+    <PackageId>Basilisque.$(MSBuildProjectName)</PackageId>
   </PropertyGroup>
   
   <!-- NuGet package properties and project info -->

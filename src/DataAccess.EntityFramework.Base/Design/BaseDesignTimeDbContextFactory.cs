@@ -32,7 +32,7 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
     /// <inheritdoc />
     public TDbContext CreateDbContext(string[] args)
     {
-        var serviceProvider = createServiceProvider();
+        var serviceProvider = createServiceProvider(args);
 
         _scope ??= serviceProvider.CreateScope();
 
@@ -43,28 +43,36 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
     /// Override this method in the provider specific implementation to configure the <see cref="IServiceCollection"/> that is used to create the <see cref="DbContext"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> that is being initialized.</param>
-    protected virtual void ConfigureProviderServices(IServiceCollection services)
+    /// <param name="args">The arguments provided by the design-time service.</param>
+    /// <param name="isChildFactory">Indicates whether the current factory instance is used as a child factory in a project for multiple database providers.</param>
+    public virtual void ConfigureProviderServices(IServiceCollection services, string[] args, bool isChildFactory)
     { /* for overriding purposes only */ }
 
     /// <summary>
     /// Override this method to configure the <see cref="IServiceCollection"/> that is used to create the <see cref="DbContext"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> that is being initialized.</param>
-    protected virtual void ConfigureServices(IServiceCollection services)
+    /// <param name="args">The arguments provided by the design-time service.</param>
+    protected virtual void ConfigureServices(IServiceCollection services, string[] args)
     { /* for overriding purposes only */ }
 
     /// <summary>
     /// Creates the <see cref="IConfiguration"/> that is used during design time.
     /// </summary>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/> that can be used to get services.</param>
+    /// <param name="args">The arguments provided by the design-time service.</param>
     /// <returns>The <see cref="IConfiguration"/> that is used during design time.</returns>
-    protected virtual IConfiguration CreateConfiguration(IServiceProvider serviceProvider)
+    protected virtual IConfiguration CreateConfiguration(IServiceProvider serviceProvider, string[] args)
     {
+        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                          ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                          ?? "Development";
+
         var currentDirectory = GetAppSettingsPath(System.IO.Directory.GetCurrentDirectory());
         return new ConfigurationBuilder()
             .SetBasePath(currentDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
             .Build();
     }
@@ -108,22 +116,22 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
         return result;
     }
 
-    private ServiceProvider createServiceProvider()
+    private ServiceProvider createServiceProvider(string[] args)
     {
         IServiceCollection services = new ServiceCollection();
 
-        configureServices(services);
+        configureServices(services, args);
 
-        ConfigureProviderServices(services);
+        ConfigureProviderServices(services, args, isChildFactory: false);
 
-        ConfigureServices(services);
+        ConfigureServices(services, args);
 
         return services.BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
     }
 
-    private void configureServices(IServiceCollection services)
+    private void configureServices(IServiceCollection services, string[] args)
     {
-        services.AddSingleton<IConfiguration>(sp => CreateConfiguration(sp));
+        services.AddSingleton<IConfiguration>(sp => CreateConfiguration(sp, args));
         services.AddSingleton<IDbProviderServiceProvider, DbProviderServiceProvider>();
         services.AddSingleton<IConnectionStringBuilder, ConnectionStringBuilder>();
 
