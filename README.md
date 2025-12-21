@@ -13,14 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-# Basilisque - Data Access
+# Basilisque - Data Access Entity Framework
 
 ## Overview
-This project provides functionality for data access.
+This project provides functionality for data access with Entity Framework Core.
 
-[![NuGet Basilisque.DataAccess](https://img.shields.io/badge/NuGet_Basilisque.DataAccess-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess)
+[![NuGet Basilisque.DataAccess.EntityFramework](https://img.shields.io/badge/NuGet_Basilisque.DataAccess.EntityFramework-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess.EntityFramework)
 [![License](https://img.shields.io/badge/License-Apache%20License%202.0-%23D22128.svg?logo=apache&logoColor=%23D22128)](LICENSE.txt)
-[![SonarCloud](https://img.shields.io/badge/SonarCloud-main-%23F3702A.svg?logo=sonarcloud&logoColor=%23F3702A)](https://sonarcloud.io/project/overview?id=basilisque-framework_DataAccess)  
+[![SonarCloud](https://img.shields.io/badge/SonarCloud-main-%23F3702A.svg?logo=sonarcloud&logoColor=%23F3702A)](https://sonarcloud.io/project/overview?id=basilisque-framework_DataAccess.EntityFramework)  
 
 <!--## Description
 This project contains functionality for registering services at the IServiceCollection.  

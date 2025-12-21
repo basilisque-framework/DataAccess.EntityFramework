@@ -20,9 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataAccess.Base\DataAccess.Base.csproj" />
-  </ItemGroup>
 
   <!-- Pack README -->
   <ItemGroup>
