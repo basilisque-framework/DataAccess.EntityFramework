@@ -34,7 +34,6 @@ jobs:
     with:
       basBuildType: 'CI'
       projectOrSolution: 'src/Basilisque.DataAccess.EntityFramework.slnx'
-      publishTargetFramework: 'netstandard2.0'
       sonarProjectKey: 'basilisque-framework_DataAccess.EntityFramework'
       sonarOrganization: 'basilisque-framework'
     secrets: inherit
