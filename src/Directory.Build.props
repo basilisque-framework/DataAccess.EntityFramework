@@ -40,5 +40,9 @@
   <!-- common build configuration for unit test projects -->
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Unit.Tests'))">
     <ProjectReference Include="..\$(MSBuildProjectName.Replace('.Unit.Tests', ''))\$(MSBuildProjectName.Replace('.Unit.Tests', '')).csproj" />
+
+    <PackageReference Include="NSubstitute" />
+
+    <Using Include="NSubstitute"/>
   </ItemGroup>
 </Project>
