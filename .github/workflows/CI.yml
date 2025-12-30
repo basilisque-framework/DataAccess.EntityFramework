@@ -36,4 +36,5 @@ jobs:
       projectOrSolution: 'src/Basilisque.DataAccess.EntityFramework.slnx'
       sonarProjectKey: 'basilisque-framework_DataAccess.EntityFramework'
       sonarOrganization: 'basilisque-framework'
+      publishTargetFramework: 'net8.0'
     secrets: inherit

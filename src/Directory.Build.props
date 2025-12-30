@@ -20,6 +20,11 @@
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <PackageId>Basilisque.$(MSBuildProjectName)</PackageId>
   </PropertyGroup>
+
+  <!-- Pack README -->
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
   
   <!-- NuGet package properties and project info -->
   <PropertyGroup>
