@@ -143,36 +143,26 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
 
     protected ReferenceAssemblies GetReferenceAssemblies()
     {
-        return ReferenceAssemblies.Net.Net80.WithPackages([
+#if NET8_0
+        var refAssemblies = ReferenceAssemblies.Net.Net80.WithPackages([
             new("Microsoft.AspNetCore.App.Ref", "8.0.0")
             ]);
+#elif NET10_0
+        var refAssemblies = new Microsoft.CodeAnalysis.Testing.ReferenceAssemblies(
+                    "net10.0",
+                    new Microsoft.CodeAnalysis.Testing.PackageIdentity(
+                        "Microsoft.NETCore.App.Ref",
+                        "10.0.0"),
+                    Path.Combine("ref", "net10.0"))
+                .WithPackages([
+                    new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.AspNetCore.App.Ref", "10.0.0"),
+                    //new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.EntityFrameworkCore", "10.0.0")
+                ]);
+#else
+                throw new PlatformNotSupportedException("Please define reference assemblies for your platform!");
+#endif
 
-        //#if NET8_0
-        //        var refAssemblies = new Microsoft.CodeAnalysis.Testing.ReferenceAssemblies(
-        //                    "net8.0",
-        //                    new Microsoft.CodeAnalysis.Testing.PackageIdentity(
-        //                        "Microsoft.NETCore.App.Ref",
-        //                        "8.0.0"),
-        //                    Path.Combine("ref", "net8.0"))
-        //            .WithPackages([
-        //                new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.AspNetCore.App.Ref", "8.0.0")
-        //                ]);
-        //#elif NET10_0
-        //        var refAssemblies = new Microsoft.CodeAnalysis.Testing.ReferenceAssemblies(
-        //                    "net10.0",
-        //                    new Microsoft.CodeAnalysis.Testing.PackageIdentity(
-        //                        "Microsoft.NETCore.App.Ref",
-        //                        "10.0.0"),
-        //                    Path.Combine("ref", "net10.0"))
-        //            .WithPackages([
-        //                new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.AspNetCore.App.Ref", "10.0.0"),
-        //                //new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.EntityFrameworkCore", "10.0.0")
-        //                ]);
-        //#else
-        //        throw new PlatformNotSupportedException("Please define reference assemblies for your platform!");
-        //#endif
-
-        //        return refAssemblies;
+        return refAssemblies;
     }
 
     protected virtual IEnumerable<MetadataReference> GetMigrationAssemblyReferences()

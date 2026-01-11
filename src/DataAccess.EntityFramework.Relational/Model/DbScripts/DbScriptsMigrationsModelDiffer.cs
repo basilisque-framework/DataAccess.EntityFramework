@@ -57,10 +57,11 @@ public class DbScriptsMigrationsModelDiffer : MigrationsModelDiffer
     public DbScriptsMigrationsModelDiffer(
         IRelationalTypeMappingSource typeMappingSource,
         IMigrationsAnnotationProvider migrationsAnnotationProvider,
+        IRelationalAnnotationProvider relationalAnnotationProvider,
         IRowIdentityMapFactory rowIdentityMapFactory,
         CommandBatchPreparerDependencies commandBatchPreparerDependencies
         )
-        : base(typeMappingSource, migrationsAnnotationProvider, rowIdentityMapFactory, commandBatchPreparerDependencies)
+        : base(typeMappingSource, migrationsAnnotationProvider, relationalAnnotationProvider, rowIdentityMapFactory, commandBatchPreparerDependencies)
     { }
 
     /// <inheritdoc />
