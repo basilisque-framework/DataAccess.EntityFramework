@@ -16,8 +16,6 @@
 <Project>
   <PropertyGroup>
     <BAS_DA_EF_IsMigrationAssembly Condition="'$(BAS_DA_EF_IsMigrationAssembly)' == ''">true</BAS_DA_EF_IsMigrationAssembly>
-  </PropertyGroup>
-  <ItemGroup>
     <BAS_DA_EF_DesignTimeDbContextFactories>$(BAS_DA_EF_DesignTimeDbContextFactories),global::Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory</BAS_DA_EF_DesignTimeDbContextFactories>
-  </ItemGroup>
+  </PropertyGroup>
 </Project>
