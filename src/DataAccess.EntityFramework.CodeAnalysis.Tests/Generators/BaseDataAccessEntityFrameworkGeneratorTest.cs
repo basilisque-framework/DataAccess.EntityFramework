@@ -156,7 +156,6 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
                     Path.Combine("ref", "net10.0"))
                 .WithPackages([
                     new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.AspNetCore.App.Ref", "10.0.0"),
-                    //new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.EntityFrameworkCore", "10.0.0")
                 ]);
 #else
                 throw new PlatformNotSupportedException("Please define reference assemblies for your platform!");

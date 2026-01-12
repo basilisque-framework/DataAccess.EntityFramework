@@ -18,7 +18,9 @@
 ## Overview
 This project provides functionality for data access with Entity Framework Core.
 
-[![NuGet Basilisque.DataAccess.EntityFramework](https://img.shields.io/badge/NuGet_Basilisque.DataAccess.EntityFramework-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess.EntityFramework)
+[![NuGet Basilisque.DataAccess.EntityFramework.SqlServer](https://img.shields.io/badge/NuGet_Basilisque.DataAccess.EntityFramework.SqlServer-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess.EntityFramework.SqlServer)  
+[![NuGet Basilisque.DataAccess.EntityFramework.SQLite](https://img.shields.io/badge/NuGet_Basilisque.DataAccess.EntityFramework.SQLite-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess.EntityFramework.SQLite)  
+[![NuGet Basilisque.DataAccess.EntityFramework.PostgreSQL](https://img.shields.io/badge/NuGet_Basilisque.DataAccess.EntityFramework.PostgreSQL-latest-%23004880.svg?logo=nuget)](https://www.nuget.org/packages/Basilisque.DataAccess.EntityFramework.PostgreSQL)  
 [![License](https://img.shields.io/badge/License-Apache%20License%202.0-%23D22128.svg?logo=apache&logoColor=%23D22128)](LICENSE.txt)
 [![SonarCloud](https://img.shields.io/badge/SonarCloud-main-%23F3702A.svg?logo=sonarcloud&logoColor=%23F3702A)](https://sonarcloud.io/project/overview?id=basilisque-framework_DataAccess.EntityFramework)  
 
