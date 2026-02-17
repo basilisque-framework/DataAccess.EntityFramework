@@ -16,6 +16,7 @@
 
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace Basilisque.DataAccess.EntityFramework.Relational.Model;
 
@@ -29,10 +30,12 @@ public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFr
     /// Creates a new <see cref="BaseDbContext{TDbContext}"/>.
     /// </summary>
     /// <param name="dbProviderServiceProvider">The <see cref="IDbProviderServiceProvider"/> that is used to resolve database provider specific services.</param>
+    /// <param name="dbContextSourceFilePath">The source file path where the <typeparamref name="TDbContext"/> is defined. This parameter is automatically populated by the compiler.</param>
     protected BaseDbContext(
-        IDbProviderServiceProvider dbProviderServiceProvider
+        IDbProviderServiceProvider dbProviderServiceProvider,
+        [CallerFilePath] string dbContextSourceFilePath = ""
         )
-        : base(dbProviderServiceProvider)
+        : base(dbProviderServiceProvider, dbContextSourceFilePath)
     { }
 
     /// <summary>
