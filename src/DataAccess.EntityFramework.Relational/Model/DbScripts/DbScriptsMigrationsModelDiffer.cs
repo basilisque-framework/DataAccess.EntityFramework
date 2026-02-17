@@ -183,7 +183,7 @@ public class DbScriptsMigrationsModelDiffer : MigrationsModelDiffer
 
     private bool shouldExecuteCreateScript(DbScriptDiff difference, [NotNullWhen(true)] out string? createScript)
     {
-        createScript = difference.Source?.CreateScript;
+        createScript = difference.Target?.CreateScript;
 
         if (difference.DiffType == DiffType.Removed)
             return false;
