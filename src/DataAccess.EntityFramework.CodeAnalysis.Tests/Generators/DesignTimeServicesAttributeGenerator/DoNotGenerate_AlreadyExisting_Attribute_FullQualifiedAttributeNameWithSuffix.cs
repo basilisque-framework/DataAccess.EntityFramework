@@ -26,7 +26,7 @@ public class DoNotGenerate_AlreadyExisting_Attribute_FullQualifiedAttributeNameW
     protected override void AddSourcesUnderTest(SourceFileList sources)
     {
         sources.Add(@"
-[assembly:Microsoft.EntityFrameworkCore.Design.DesignTimeServicesReferenceAttribute(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, DataAccess.EntityFramework.Relational"")]
+[assembly:Microsoft.EntityFrameworkCore.Design.DesignTimeServicesReferenceAttribute(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, Basilisque.DataAccess.EntityFramework.Relational"")]
 ");
     }
 

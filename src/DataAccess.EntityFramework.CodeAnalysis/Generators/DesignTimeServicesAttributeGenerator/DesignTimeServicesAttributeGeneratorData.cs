@@ -24,7 +24,7 @@ public static class DesignTimeServicesAttributeGeneratorData
     private const string DesignTimeServicesAttributeCompilationName = "Basilisque_DataAccess_EntityFramework_DesignTimeServicesAttribute.g.cs";
 
     private static readonly string _designTimeServicesAttributeSource = $@"{CommonGeneratorData.GeneratedFileSharedHeaderWithNullable}
-[assembly:Microsoft.EntityFrameworkCore.Design.DesignTimeServicesReference(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, DataAccess.EntityFramework.Relational"")]
+[assembly:Microsoft.EntityFrameworkCore.Design.DesignTimeServicesReference(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, Basilisque.DataAccess.EntityFramework.Relational"")]
 ";
 
     /// <summary>

@@ -45,7 +45,7 @@ internal static class DesignTimeServicesAttributeGeneratorSelectors
             return false;
 
         var argument = attr.ArgumentList.Arguments[0].GetText().ToString();
-        if (argument != "\"Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, DataAccess.EntityFramework.Relational\"")
+        if (argument != "\"Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, Basilisque.DataAccess.EntityFramework.Relational\"")
             return false;
 
         return true;

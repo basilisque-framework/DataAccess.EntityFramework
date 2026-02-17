@@ -27,7 +27,7 @@ public class DoNotGenerate_AlreadyExisting_Attribute_UsingNamespaceWithoutSuffix
     {
         sources.Add(@"
 using Microsoft.EntityFrameworkCore.Design;
-[assembly:DesignTimeServicesReference(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, DataAccess.EntityFramework.Relational"")]
+[assembly:DesignTimeServicesReference(""Basilisque.DataAccess.EntityFramework.Relational.Design.RelationalDesignTimeServices, Basilisque.DataAccess.EntityFramework.Relational"")]
 ");
     }
 
