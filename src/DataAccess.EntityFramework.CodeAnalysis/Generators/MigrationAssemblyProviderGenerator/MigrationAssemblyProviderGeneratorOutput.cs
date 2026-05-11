@@ -26,7 +26,8 @@ internal static class MigrationAssemblyProviderGeneratorOutput
         if (data.HasExistingMigrationAssemblyProvider)
             return;
 
-        context.AddSource(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderSource);
+        var outputNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(data.BuildProperties);
+
+        context.AddSource(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource(outputNamespace));
     }
 }
-

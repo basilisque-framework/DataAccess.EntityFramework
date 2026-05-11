@@ -214,6 +214,7 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
         yield return ("/.editorconfig",
             """
             is_global = true
+            build_property.RootNamespace = Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests
             build_property.BAS_DA_EF_IsMigrationAssembly = true
             build_property.BAS_DA_EF_DesignTimeDbContextFactories = ,global::Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory,global::Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory,global::Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory
             """);
@@ -255,18 +256,25 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
     {
         var result = new List<(string Name, string SourceText)>();
 
-        addStaticSources(result);
+        addExpectedAttributeSources(result);
 
         result.AddRange(GetExpectedDbContextFactorySources());
+
+        addExpectedMigrationAssemblyProviderSources(result);
 
         return result;
     }
 
-    private void addStaticSources(List<(string Name, string SourceText)> sources)
+    private void addExpectedAttributeSources(List<(string Name, string SourceText)> sources)
     {
         sources.AddRange(GetExpectedAttributeSources(DesignTimeServicesAttributeGeneratorData.SupportedDesignTimeServicesAttributes));
+    }
 
-        var expectedMigrationAssemblyProviderSources = GetExpectedMigrationAssemblyProviderSources(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderSource);
+    private void addExpectedMigrationAssemblyProviderSources(List<(string Name, string SourceText)> sources)
+    {
+        var expectedMigrationAssemblyProviderSources = GetExpectedMigrationAssemblyProviderSources(
+            MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName,
+            MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource("Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated"));
         if (expectedMigrationAssemblyProviderSources.HasValue)
             sources.Add(expectedMigrationAssemblyProviderSources.Value);
     }

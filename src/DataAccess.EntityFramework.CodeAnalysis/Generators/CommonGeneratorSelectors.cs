@@ -44,6 +44,9 @@ internal class CommonGeneratorSelectors
         else
             dbContextFactories = null;
 
-        return new BuildPropertyInfo(isMigrationAssembly, dbContextFactories);
+        provider.GlobalOptions.TryGetValue("build_property.RootNamespace", out string? rootNamespace);
+        provider.GlobalOptions.TryGetValue("build_property.AssemblyName", out string? assemblyName);
+
+        return new BuildPropertyInfo(isMigrationAssembly, dbContextFactories, rootNamespace, assemblyName);
     }
 }

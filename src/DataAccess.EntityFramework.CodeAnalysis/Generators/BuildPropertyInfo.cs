@@ -18,12 +18,16 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators;
 
 internal readonly struct BuildPropertyInfo
 {
-    public BuildPropertyInfo(bool isMigrationAssembly, string[]? designTimeDbContextFactories)
+    public BuildPropertyInfo(bool isMigrationAssembly, string[]? designTimeDbContextFactories, string? rootNamespace, string? assemblyName)
     {
         IsMigrationAssembly = isMigrationAssembly;
         DesignTimeDbContextFactories = designTimeDbContextFactories;
+        RootNamespace = rootNamespace;
+        AssemblyName = assemblyName;
     }
 
     public bool IsMigrationAssembly { get; }
     public string[]? DesignTimeDbContextFactories { get; }
+    public string? RootNamespace { get; }
+    public string? AssemblyName { get; }
 }

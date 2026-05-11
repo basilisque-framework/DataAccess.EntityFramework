@@ -14,6 +14,9 @@
    limitations under the License.
 -->
 <Project>
+  <PropertyGroup>
+    <BAS_DI_Extensions>$(BAS_DI_Extensions),BAS_DA_EF_DIExt</BAS_DI_Extensions>
+  </PropertyGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="BAS_DA_EF_IsMigrationAssembly" />
     <CompilerVisibleProperty Include="BAS_DA_EF_DesignTimeDbContextFactories" />

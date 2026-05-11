@@ -15,6 +15,7 @@
 */
 
 using Basilisque.CodeAnalysis.Syntax;
+using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
 using System.Collections.Immutable;
 
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeDbContextFactoryGenerator;
@@ -42,9 +43,9 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
             return;
 
         if (data.GeneratorInfo.DesignTimeFactories.Length > 1)
-            outputMultipleProviders(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames);
+            outputMultipleProviders(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames, data.BuildProperties);
         else
-            outputSingleProvider(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames[0]);
+            outputSingleProvider(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames[0], data.BuildProperties);
     }
 
     private static ImmutableArray<string> getActiveDesignTimeFactories(ImmutableArray<INamedTypeSymbol> designTimeFactories, string[]? designTimeDbContextFactories)
@@ -54,15 +55,17 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         return baseDesignTimeFactoryFQName.Where(f => designTimeDbContextFactories.Contains(f)).OrderBy(s => s).ToImmutableArray();
     }
 
-    private static void outputSingleProvider(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, string baseDesignTimeFactoryFQName)
+    private static void outputSingleProvider(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, string baseDesignTimeFactoryFQName, BuildPropertyInfo buildProperties)
     {
         outputProvider(context, registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
         {
             classInfo.BaseClass = $"{baseDesignTimeFactoryFQName}<{fullQualifiedDbContextName}>";
+
+            addMigrationAssemblyProviderRegistration(classInfo, buildProperties);
         });
     }
 
-    private static void outputMultipleProviders(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, ImmutableArray<string> baseDesignTimeFactoryFQNames)
+    private static void outputMultipleProviders(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, ImmutableArray<string> baseDesignTimeFactoryFQNames, BuildPropertyInfo buildProperties)
     {
         outputProvider(context, registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
         {
@@ -89,7 +92,26 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
             }
 
             classInfo.Methods.Add(m);
+
+            addMigrationAssemblyProviderRegistration(classInfo, buildProperties);
         });
+    }
+
+    private static void addMigrationAssemblyProviderRegistration(ClassInfo classInfo, BuildPropertyInfo buildProperties)
+    {
+        var migrationAssemblyProviderNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(buildProperties);
+
+        var m = new MethodInfo(AccessModifier.Protected, "sealed override void", "ConfigureMigrationAssemblyProvider")
+        {
+            InheritXmlDoc = true
+        };
+
+        m.Parameters.Add(new ParameterInfo(ParameterKind.Ordinary, "global::Microsoft.Extensions.DependencyInjection.IServiceCollection", "services"));
+        m.Parameters.Add(new ParameterInfo(ParameterKind.Ordinary, "string[]", "args"));
+
+        m.Body.Add($"global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::{migrationAssemblyProviderNamespace}.MigrationAssemblyProvider>(services);");
+
+        classInfo.Methods.Add(m);
     }
 
     private static void outputProvider(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, Action<string, ClassInfo> classConfiguration)

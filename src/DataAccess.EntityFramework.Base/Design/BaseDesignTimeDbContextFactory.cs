@@ -16,6 +16,7 @@
 
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
+using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,14 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
     /// <param name="services">The <see cref="IServiceCollection"/> that is being initialized.</param>
     /// <param name="args">The arguments provided by the design-time service.</param>
     protected virtual void ConfigureServices(IServiceCollection services, string[] args)
+    { /* for overriding purposes only */ }
+
+    /// <summary>
+    /// Override this method to configure the <see cref="IMigrationAssemblyProvider"/> that is used to resolve the migration assembly.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> that is being initialized.</param>
+    /// <param name="args">The arguments provided by the design-time service.</param>
+    protected virtual void ConfigureMigrationAssemblyProvider(IServiceCollection services, string[] args)
     { /* for overriding purposes only */ }
 
     /// <summary>
@@ -121,6 +130,8 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
         IServiceCollection services = new ServiceCollection();
 
         configureServices(services, args);
+
+        ConfigureMigrationAssemblyProvider(services, args);
 
         ConfigureProviderServices(services, args, isChildFactory: false);
 

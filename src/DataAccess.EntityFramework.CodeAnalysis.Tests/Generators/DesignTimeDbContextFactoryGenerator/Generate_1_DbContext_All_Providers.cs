@@ -45,6 +45,12 @@ public partial class MyDbContextDesignTimeFactory : global::Basilisque.DataAcces
         _designTimeFactory2.ConfigureProviderServices(services, args, isChildFactory: true);
         _designTimeFactory3.ConfigureProviderServices(services, args, isChildFactory: true);
     }}
+    
+    /// <inheritdoc />
+    protected sealed override void ConfigureMigrationAssemblyProvider(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services, string[] args)
+    {{
+        global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated.MigrationAssemblyProvider>(services);
+    }}
 }}
 
 #nullable restore");

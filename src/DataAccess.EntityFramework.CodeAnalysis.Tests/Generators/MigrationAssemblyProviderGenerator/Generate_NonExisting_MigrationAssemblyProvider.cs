@@ -14,7 +14,6 @@
    limitations under the License.
 */
 
-using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generators.MigrationAssemblyProviderGenerator;
@@ -44,8 +43,8 @@ using Microsoft.EntityFrameworkCore.Design;
     protected override (string Name, string SourceText)? GetExpectedMigrationAssemblyProviderSources(string migrationAssemblyProviderCompilationName, string migrationAssemblyProviderSource)
     {
         return (
-            Name: MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName,
-            SourceText: MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderSource
+            Name: migrationAssemblyProviderCompilationName,
+            SourceText: migrationAssemblyProviderSource
             );
     }
 }

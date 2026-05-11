@@ -27,9 +27,11 @@ public static class MigrationAssemblyProviderGeneratorData
     public const string MigrationAssemblyProviderCompilationName = "Basilisque_DataAccess_EntityFramework_MigrationAssemblyProvider.g.cs";
 
     /// <summary>
-    /// The source code for the generated migration assembly provider implementation.
+    /// The source code template for the generated migration assembly provider implementation.
     /// </summary>
-    public static readonly string MigrationAssemblyProviderSource = $@"{CommonGeneratorData.GeneratedFileSharedHeaderWithNullable}
+    private static readonly string MigrationAssemblyProviderSourceTemplate = $@"{CommonGeneratorData.GeneratedFileSharedHeaderWithNullable}
+namespace __BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__;
+
 /// <summary>
 /// <inheritdoc cref=""global::Basilisque.DataAccess.EntityFramework.Base.Model.MigrationAssemblyProvider"" />
 /// </summary>
@@ -37,4 +39,26 @@ public partial class MigrationAssemblyProvider : global::Basilisque.DataAccess.E
 {{
 }}
 ";
+
+    internal static string GetMigrationAssemblyProviderNamespace(BuildPropertyInfo buildProperties)
+    {
+        if (!string.IsNullOrWhiteSpace(buildProperties.RootNamespace))
+            return $"{buildProperties.RootNamespace}.Generated";
+
+        if (!string.IsNullOrWhiteSpace(buildProperties.AssemblyName))
+            return $"{buildProperties.AssemblyName}.Generated";
+
+        return "Basilisque.DataAccess.EntityFramework.Generated";
+    }
+
+    /// <summary>
+    /// Generates the source code for a migration assembly provider by replacing the namespace placeholder in the
+    /// template with the specified namespace.
+    /// </summary>
+    /// <param name="namespace">The namespace to insert into the migration assembly provider source template. Cannot be null.</param>
+    /// <returns>A string containing the migration assembly provider source code with the specified namespace applied.</returns>
+    public static string GetMigrationAssemblyProviderSource(string @namespace)
+    {
+        return MigrationAssemblyProviderSourceTemplate.Replace("__BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__", @namespace);
+    }
 }

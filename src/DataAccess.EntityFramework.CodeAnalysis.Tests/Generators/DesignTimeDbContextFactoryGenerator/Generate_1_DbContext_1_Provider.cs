@@ -34,6 +34,11 @@ namespace DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext;
 {CommonGeneratorData.GeneratedClassSharedAttributesNotIndented}
 public partial class MyDbContextDesignTimeFactory : global::Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory<DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext>
 {{
+    /// <inheritdoc />
+    protected sealed override void ConfigureMigrationAssemblyProvider(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services, string[] args)
+    {{
+        global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated.MigrationAssemblyProvider>(services);
+    }}
 }}
 
 #nullable restore");
