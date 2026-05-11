@@ -78,6 +78,12 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
         yield break;
     }
 
+    protected override (string Name, string SourceText)? GetExpectedMigrationAssemblyProviderSources(string migrationAssemblyProviderCompilationName, string migrationAssemblyProviderSource)
+    {
+        // since the generator is disabled, no migration assembly provider source is expected
+        return null;
+    }
+
     protected override IEnumerable<(string filename, string content)> GetAnalyzerConfigFiles()
     {
         var configFiles = base.GetAnalyzerConfigFiles();

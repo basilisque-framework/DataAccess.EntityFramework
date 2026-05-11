@@ -26,20 +26,28 @@ namespace Basilisque.DataAccess.EntityFramework.SQLite.Model;
 internal class SQLiteDbContextOptionsConfigurator : BaseDbContextOptionsConfigurator
 {
     private readonly IConnectionStringBuilder _connectionStringBuilder;
+    private readonly IMigrationAssemblyProvider? _migrationAssemblyProvider;
 
     public SQLiteDbContextOptionsConfigurator(
-        [FromKeyedServices(SQLiteDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder
+        [FromKeyedServices(SQLiteDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder,
+        IMigrationAssemblyProvider? migrationAssemblyProvider = null
         )
     {
         ArgumentNullException.ThrowIfNull(connectionStringBuilder);
 
         _connectionStringBuilder = connectionStringBuilder;
+        _migrationAssemblyProvider = migrationAssemblyProvider;
     }
 
     protected override void OnConfigure<TDbContext>(BaseDbContext<TDbContext> dbContext, DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = _connectionStringBuilder.GetConnectionString(typeof(TDbContext).Name, SQLiteDbProviderInfo.ProviderKeyName);
 
-        optionsBuilder.UseSqlite(connectionString);
+        optionsBuilder.UseSqlite(connectionString, o =>
+        {
+            var migrationAssemblyName = _migrationAssemblyProvider?.GetMigrationAssemblyName();
+            if (migrationAssemblyName is not null)
+                o.MigrationsAssembly(migrationAssemblyName);
+        });
     }
 }

@@ -26,20 +26,28 @@ namespace Basilisque.DataAccess.EntityFramework.SqlServer.Model;
 internal class SqlServerDbContextOptionsConfigurator : BaseDbContextOptionsConfigurator
 {
     private readonly IConnectionStringBuilder _connectionStringBuilder;
+    private readonly IMigrationAssemblyProvider? _migrationAssemblyProvider;
 
     public SqlServerDbContextOptionsConfigurator(
-        [FromKeyedServices(SqlServerDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder
+        [FromKeyedServices(SqlServerDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder,
+        IMigrationAssemblyProvider? migrationAssemblyProvider = null
         )
     {
         ArgumentNullException.ThrowIfNull(connectionStringBuilder);
 
         _connectionStringBuilder = connectionStringBuilder;
+        _migrationAssemblyProvider = migrationAssemblyProvider;
     }
 
     protected override void OnConfigure<TDbContext>(BaseDbContext<TDbContext> dbContext, DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = _connectionStringBuilder.GetConnectionString(typeof(TDbContext).Name, SqlServerDbProviderInfo.ProviderKeyName);
 
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseSqlServer(connectionString, o =>
+        {
+            var migrationAssemblyName = _migrationAssemblyProvider?.GetMigrationAssemblyName();
+            if (migrationAssemblyName is not null)
+                o.MigrationsAssembly(migrationAssemblyName);
+        });
     }
 }

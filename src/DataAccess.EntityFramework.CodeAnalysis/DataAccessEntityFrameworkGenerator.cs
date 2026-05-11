@@ -35,6 +35,8 @@ public class DataAccessEntityFrameworkGenerator : IIncrementalGenerator
         initializeDesignTimeServicesAttributeGenerator(context, buildPropertiesSelector);
 
         initializeDesignTimeDbContextFactoryGenerator(context, buildPropertiesSelector);
+
+        initializeMigrationAssemblyProviderGenerator(context, buildPropertiesSelector);
     }
 
     private void initializeDesignTimeServicesAttributeGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector)
@@ -49,5 +51,12 @@ public class DataAccessEntityFrameworkGenerator : IIncrementalGenerator
         var classesToGenerateProvider = DesignTimeDbContextFactoryGeneratorSelectors.GetDbContextsToGenerate(context);
 
         context.RegisterCompilationInfoOutput(classesToGenerateProvider.Combine(buildPropertiesSelector), DesignTimeDbContextFactoryGeneratorOutput.OutputImplementations);
+    }
+
+    private void initializeMigrationAssemblyProviderGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector)
+    {
+        var existingMigrationAssembliyProvidersProvider = MigrationAssemblyProviderGeneratorSelectors.HasExistingMigrationAssemblyProvider(context);
+
+        context.RegisterSourceOutput(existingMigrationAssembliyProvidersProvider.Combine(buildPropertiesSelector), MigrationAssemblyProviderGeneratorOutput.OutputMigrationAssemblyProviders);
     }
 }

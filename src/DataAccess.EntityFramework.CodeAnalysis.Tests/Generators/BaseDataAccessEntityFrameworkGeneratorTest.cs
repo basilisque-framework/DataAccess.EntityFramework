@@ -35,6 +35,7 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest : BaseDataAcces
     protected const string CommonCategory = "Common";
     protected const string DesignTimeServicesAttributeGeneratorCategory = "DesignTimeServicesAttributeGenerator";
     protected const string DesignTimeDbContextFactoryGeneratorCategory = "DesignTimeDbContextFactoryGenerator";
+    protected const string MigrationAssemblyProviderGeneratorCategory = "MigrationAssemblyProviderGenerator";
 }
 
 [InheritsTests]
@@ -243,6 +244,11 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
         return supportedAttributes.Values;
     }
 
+    protected virtual (string Name, string SourceText)? GetExpectedMigrationAssemblyProviderSources(string migrationAssemblyProviderCompilationName, string migrationAssemblyProviderSource)
+    {
+        return (migrationAssemblyProviderCompilationName, migrationAssemblyProviderSource);
+    }
+
     protected abstract IEnumerable<(string Name, string SourceText)> GetExpectedDbContextFactorySources();
 
     private List<(string Name, string SourceText)> getExpectedSources()
@@ -259,5 +265,9 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
     private void addStaticSources(List<(string Name, string SourceText)> sources)
     {
         sources.AddRange(GetExpectedAttributeSources(DesignTimeServicesAttributeGeneratorData.SupportedDesignTimeServicesAttributes));
+
+        var expectedMigrationAssemblyProviderSources = GetExpectedMigrationAssemblyProviderSources(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderSource);
+        if (expectedMigrationAssemblyProviderSources.HasValue)
+            sources.Add(expectedMigrationAssemblyProviderSources.Value);
     }
 }

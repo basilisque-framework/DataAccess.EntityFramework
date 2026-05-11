@@ -26,20 +26,28 @@ namespace Basilisque.DataAccess.EntityFramework.PostgreSQL.Model;
 internal class PostgreSQLDbContextOptionsConfigurator : BaseDbContextOptionsConfigurator
 {
     private readonly IConnectionStringBuilder _connectionStringBuilder;
+    private readonly IMigrationAssemblyProvider? _migrationAssemblyProvider;
 
     public PostgreSQLDbContextOptionsConfigurator(
-        [FromKeyedServices(PostgreSQLDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder
+        [FromKeyedServices(PostgreSQLDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder,
+        IMigrationAssemblyProvider? migrationAssemblyProvider = null
         )
     {
         ArgumentNullException.ThrowIfNull(connectionStringBuilder);
 
         _connectionStringBuilder = connectionStringBuilder;
+        _migrationAssemblyProvider = migrationAssemblyProvider;
     }
 
     protected override void OnConfigure<TDbContext>(BaseDbContext<TDbContext> dbContext, DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = _connectionStringBuilder.GetConnectionString(typeof(TDbContext).Name, PostgreSQLDbProviderInfo.ProviderKeyName);
 
-        optionsBuilder.UseNpgsql(connectionString);
+        optionsBuilder.UseNpgsql(connectionString, o =>
+        {
+            var migrationAssemblyName = _migrationAssemblyProvider?.GetMigrationAssemblyName();
+            if (migrationAssemblyName is not null)
+                o.MigrationsAssembly(migrationAssemblyName);
+        });
     }
 }
