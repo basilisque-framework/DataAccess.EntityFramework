@@ -1,5 +1,5 @@
 <!--
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.0" />
     <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.0" />
-    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="1.0.0" />
+    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-Preview00008" />
     <PackageVersion Include="Basilisque.DependencyInjection" Version="1.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
@@ -37,11 +37,18 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="6.7.0" />
   </ItemGroup>
   
   <!-- Common Packages -->
   <ItemGroup>
-    <PackageReference Include="Basilisque.CommonFrameworkBuild" />
+    <PackageReference Include="Basilisque.CommonFrameworkBuild">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="GitVersion.MsBuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <!-- Common Packages (not for Code Analysis projects) -->
