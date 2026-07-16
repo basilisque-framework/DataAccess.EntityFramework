@@ -42,7 +42,16 @@ public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFr
     /// Gets the app area prefix for the table names.
     /// </summary>
     /// <returns>The app area prefix for the table name.</returns>
-    protected abstract string GetAppAreaPrefix();
+    protected abstract string? GetAppAreaPrefix();
+
+    /// <summary>
+    /// Gets the separator between the app area prefix and the table name. The default is "_".
+    /// </summary>
+    /// <returns>The separator between the app area prefix and the table name.</returns>
+    protected virtual string GetAppAreaPrefixSeparator()
+    {
+        return "_";
+    }
 
     /// <summary>
     /// Override this method to further configure the model that was discovered by convention from the entity types
@@ -120,11 +129,13 @@ public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFr
         var appArea = GetAppAreaPrefix();
 
         if (string.IsNullOrWhiteSpace(appArea))
-            throw new ArgumentNullException(appArea);
+            return;
+
+        var separator = GetAppAreaPrefixSeparator();
 
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName($"{appArea}_{entity.GetTableName()}");
+            entity.SetTableName($"{appArea}{separator}{entity.GetTableName()}");
         }
     }
 }
