@@ -17,6 +17,7 @@ name: CI Build
 permissions:
   contents: write
   packages: write
+  id-token: write  # enable GitHub OIDC token issuance for this job
 
 on:
   push:
