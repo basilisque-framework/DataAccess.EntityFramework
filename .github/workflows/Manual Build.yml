@@ -18,6 +18,7 @@ run-name: ${{ inputs.basBuildTypeChoice }} Build
 permissions:
   contents: write
   packages: write
+  id-token: write  # enable GitHub OIDC token issuance for this job
 
 on:
   workflow_dispatch:
