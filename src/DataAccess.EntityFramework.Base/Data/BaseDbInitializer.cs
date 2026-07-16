@@ -31,6 +31,9 @@ public abstract class BaseDbInitializer<TDbContext> : IDbInitializer
     /// </summary>
     protected TDbContext DbContext { get; }
 
+    /// <inheritdoc />
+    DbContext IDbInitializer.DbContext => DbContext;
+
     /// <summary>
     /// Creates a new <see cref="BaseDbInitializer{TDbContext}"/>.
     /// </summary>

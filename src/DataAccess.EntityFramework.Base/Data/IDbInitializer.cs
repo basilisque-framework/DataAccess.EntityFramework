@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Basilisque.DataAccess.EntityFramework.Base.Data;
 
 /// <summary>
@@ -22,6 +24,11 @@ namespace Basilisque.DataAccess.EntityFramework.Base.Data;
 [RegisterServiceTransient(As = typeof(IDbInitializer))]
 public interface IDbInitializer
 {
+    /// <summary>
+    /// The DbContext that should be initialized.
+    /// </summary>
+    DbContext DbContext { get; }
+
     /// <summary>
     /// 1. Execute functionality before the database migration/creation.
     /// </summary>
