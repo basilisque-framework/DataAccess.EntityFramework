@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -70,6 +70,11 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
     }
 }
 "], []);
+    }
+
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
+    {
+        yield return "DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext";
     }
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()

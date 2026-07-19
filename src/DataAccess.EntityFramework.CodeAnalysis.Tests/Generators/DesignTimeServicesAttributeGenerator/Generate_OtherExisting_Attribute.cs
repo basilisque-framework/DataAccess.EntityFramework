@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,6 +31,11 @@ public class Generate_OtherExisting_Attribute : BaseDataAccessEntityFrameworkGen
     }
 
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedDbContextFactorySources()
+    {
+        yield break;
+    }
+
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
     {
         yield break;
     }

@@ -49,6 +49,11 @@ public sealed class CustomMigrationAssemblyProvider : Basilisque.DataAccess.Enti
         yield break;
     }
 
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
+    {
+        yield break;
+    }
+
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedAttributeSources(IReadOnlyDictionary<string, (string CompilationName, string Source)> supportedAttributes)
     {
         // do not call base class because the migration assembly provider is already implemented

@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generato
 
 [InheritsTests]
 [Category(DesignTimeServicesAttributeGeneratorCategory)]
-public class DoNotGenerate_WhenDisabled : BaseDataAccessEntityFrameworkGeneratorTest
+public class Generate_NonExisting_Attribute : BaseDataAccessEntityFrameworkGeneratorTest
 {
     protected override void AddSourcesUnderTest(SourceFileList sources)
     {
@@ -28,6 +28,11 @@ public class DoNotGenerate_WhenDisabled : BaseDataAccessEntityFrameworkGenerator
     }
 
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedDbContextFactorySources()
+    {
+        yield break;
+    }
+
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
     {
         yield break;
     }

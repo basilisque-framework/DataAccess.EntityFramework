@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -60,11 +60,15 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
 "], []);
     }
 
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
+    {
+        yield break;
+    }
+
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()
     {
         yield return ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory;
     }
-
 
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedDbContextFactorySources()
     {

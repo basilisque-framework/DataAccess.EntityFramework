@@ -35,6 +35,11 @@ using Microsoft.EntityFrameworkCore.Design;
         yield break;
     }
 
+    protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
+    {
+        yield break;
+    }
+
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedAttributeSources(IReadOnlyDictionary<string, (string CompilationName, string Source)> supportedAttributes)
     {
         yield break;

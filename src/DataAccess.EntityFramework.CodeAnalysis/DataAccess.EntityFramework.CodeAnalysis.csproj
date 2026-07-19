@@ -1,5 +1,5 @@
 <!--
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
   <PropertyGroup>
     <TargetFrameworks></TargetFrameworks>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <BAS_CB_Set_LangVersion>false</BAS_CB_Set_LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Basilisque.CodeAnalysis" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <PrivateAssets>all</PrivateAssets>

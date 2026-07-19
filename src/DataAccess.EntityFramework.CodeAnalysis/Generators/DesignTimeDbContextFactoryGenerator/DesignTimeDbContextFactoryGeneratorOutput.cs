@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 using Basilisque.CodeAnalysis.Syntax;
 using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
+using Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport.DependencyInjectionGenerator;
 using System.Collections.Immutable;
 
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeDbContextFactoryGenerator;
@@ -29,23 +30,26 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
 
     private static SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobalNamespace = SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
-    internal static void OutputImplementations(SourceProductionContext context, (DesignTimeDbContextFactoryGeneratorInfo GeneratorInfo, BuildPropertyInfo BuildProperties) data, RegistrationOptions registrationOptions)
+    internal static void OutputImplementations(SourceProductionContext context, ((DesignTimeDbContextFactoryGeneratorInfo GeneratorInfo, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
     {
-        if (!data.BuildProperties.IsMigrationAssembly)
+        if (!data.Input.BuildProperties.IsMigrationAssembly)
             return;
 
         if (!checkPreconditions(registrationOptions))
             return;
 
-        var baseDesignTimeFactoryFQNames = getActiveDesignTimeFactories(data.GeneratorInfo.DesignTimeFactories, data.BuildProperties.DesignTimeDbContextFactories);
+        var baseDesignTimeFactoryFQNames = getActiveDesignTimeFactories(data.Input.GeneratorInfo.DesignTimeFactories, data.Input.BuildProperties.DesignTimeDbContextFactories);
 
-        if (baseDesignTimeFactoryFQNames.Length < 1 || data.GeneratorInfo.DbContexts.Length < 1)
+        if (baseDesignTimeFactoryFQNames.Length < 1 || data.Input.GeneratorInfo.DbContexts.Length < 1)
             return;
 
-        if (data.GeneratorInfo.DesignTimeFactories.Length > 1)
-            outputMultipleProviders(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames, data.BuildProperties);
+        if (data.Input.GeneratorInfo.DesignTimeFactories.Length > 1)
+            outputMultipleProviders(context, registrationOptions, data.Input.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
         else
-            outputSingleProvider(context, registrationOptions, data.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames[0], data.BuildProperties);
+            outputSingleProvider(context, registrationOptions, data.Input.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);
+
+        var diExtensionData = (data.Input.GeneratorInfo.DbContexts, data.DIInfo);
+        DependencyInjectionExtensionGeneratorOutput.OutputImplementations(context, diExtensionData, registrationOptions, "BAS_DA_EF_DIExt_DBC", registerExtensionCallback: outputDependencyInjectionExtension);
     }
 
     private static ImmutableArray<string> getActiveDesignTimeFactories(ImmutableArray<INamedTypeSymbol> designTimeFactories, string[]? designTimeDbContextFactories)
@@ -145,5 +149,14 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
             throw new System.NotSupportedException($"The language '{registrationOptions.Language}' is currently not supported by this generator.");
 
         return true;
+    }
+
+    private static void outputDependencyInjectionExtension(SourceProductionContext context, CodeLines registrationMethodBody, ImmutableArray<INamedTypeSymbol> implementationParameters)
+    {
+        foreach (var dbContextSymbol in implementationParameters)
+        {
+            var fullQualifiedName = dbContextSymbol.ToDisplayString(_fullyQualifiedFormatWithoutGlobalNamespace);
+            registrationMethodBody.Add($"services.AddDbContext<global::{fullQualifiedName}>();");
+        }
     }
 }

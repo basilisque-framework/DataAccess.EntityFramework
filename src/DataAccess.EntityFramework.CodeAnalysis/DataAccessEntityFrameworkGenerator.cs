@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ using Basilisque.CodeAnalysis.Syntax;
 using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators;
 using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeDbContextFactoryGenerator;
 using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
+using Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport.Common;
 
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis;
 
@@ -32,11 +33,13 @@ public class DataAccessEntityFrameworkGenerator : IIncrementalGenerator
     {
         var buildPropertiesSelector = context.AnalyzerConfigOptionsProvider.Select(Generators.CommonGeneratorSelectors.BuildPropertiesSelector);
 
+        var diExtensionValueProvider = context.GetDependencyInjectionExtensionValueProvider();
+
         initializeDesignTimeServicesAttributeGenerator(context, buildPropertiesSelector);
 
-        initializeDesignTimeDbContextFactoryGenerator(context, buildPropertiesSelector);
+        initializeDesignTimeDbContextFactoryGenerator(context, buildPropertiesSelector, diExtensionValueProvider);
 
-        initializeMigrationAssemblyProviderGenerator(context, buildPropertiesSelector);
+        initializeMigrationAssemblyProviderGenerator(context, buildPropertiesSelector, diExtensionValueProvider);
     }
 
     private void initializeDesignTimeServicesAttributeGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector)
@@ -46,17 +49,21 @@ public class DataAccessEntityFrameworkGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(existingAttributesProvider.Combine(buildPropertiesSelector), DesignTimeServicesAttributeGeneratorOutput.OutputAttributes);
     }
 
-    private void initializeDesignTimeDbContextFactoryGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector)
+    private void initializeDesignTimeDbContextFactoryGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector, IncrementalValueProvider<(string? RootNamespace, string? AssemblyName)> diExtensionValueProvider)
     {
         var classesToGenerateProvider = DesignTimeDbContextFactoryGeneratorSelectors.GetDbContextsToGenerate(context);
 
-        context.RegisterCompilationInfoOutput(classesToGenerateProvider.Combine(buildPropertiesSelector), DesignTimeDbContextFactoryGeneratorOutput.OutputImplementations);
+        var combinedProvider = classesToGenerateProvider.Combine(buildPropertiesSelector).Combine(diExtensionValueProvider);
+
+        context.RegisterCompilationInfoOutput(combinedProvider, DesignTimeDbContextFactoryGeneratorOutput.OutputImplementations);
     }
 
-    private void initializeMigrationAssemblyProviderGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector)
+    private void initializeMigrationAssemblyProviderGenerator(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<BuildPropertyInfo> buildPropertiesSelector, IncrementalValueProvider<(string? RootNamespace, string? AssemblyName)> diExtensionValueProvider)
     {
         var existingMigrationAssembliyProvidersProvider = MigrationAssemblyProviderGeneratorSelectors.HasExistingMigrationAssemblyProvider(context);
 
-        context.RegisterSourceOutput(existingMigrationAssembliyProvidersProvider.Combine(buildPropertiesSelector), MigrationAssemblyProviderGeneratorOutput.OutputMigrationAssemblyProviders);
+        var combinedProvider = existingMigrationAssembliyProvidersProvider.Combine(buildPropertiesSelector).Combine(diExtensionValueProvider);
+
+        context.RegisterCompilationInfoOutput(combinedProvider, MigrationAssemblyProviderGeneratorOutput.OutputMigrationAssemblyProviders);
     }
 }

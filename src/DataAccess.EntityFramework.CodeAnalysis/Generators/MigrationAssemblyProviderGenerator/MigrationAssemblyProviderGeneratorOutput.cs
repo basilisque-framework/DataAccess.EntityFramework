@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2026 Alexander Stärk
+   Copyright 2026-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,20 +14,34 @@
    limitations under the License.
 */
 
+using Basilisque.CodeAnalysis.Syntax;
+using Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport.DependencyInjectionGenerator;
+
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
 
 internal static class MigrationAssemblyProviderGeneratorOutput
 {
-    internal static void OutputMigrationAssemblyProviders(SourceProductionContext context, (bool HasExistingMigrationAssemblyProvider, BuildPropertyInfo BuildProperties) data)
+    internal static void OutputMigrationAssemblyProviders(SourceProductionContext context, ((bool HasExistingMigrationAssemblyProvider, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
     {
-        if (!data.BuildProperties.IsMigrationAssembly)
+        if (!data.Input.BuildProperties.IsMigrationAssembly)
             return;
 
-        if (data.HasExistingMigrationAssemblyProvider)
+        if (data.Input.HasExistingMigrationAssemblyProvider)
             return;
 
-        var outputNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(data.BuildProperties);
+        var outputNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(data.Input.BuildProperties);
 
         context.AddSource(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource(outputNamespace));
+
+        var migrationAssemblyProviderFQN = $"{outputNamespace}.MigrationAssemblyProvider";
+
+        var diExtensionData = (migrationAssemblyProviderFQN, data.DIInfo);
+
+        DependencyInjectionExtensionGeneratorOutput.OutputImplementations(context, diExtensionData, registrationOptions, "BAS_DA_EF_DIExt_MAP", registerExtensionCallback: outputDependencyRegistrationExtension);
+    }
+
+    private static void outputDependencyRegistrationExtension(SourceProductionContext context, CodeLines registrationMethodBody, string migrationAssemblyProviderFQN)
+    {
+        registrationMethodBody.Add($"services.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::{migrationAssemblyProviderFQN}>();");
     }
 }
