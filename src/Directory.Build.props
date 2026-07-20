@@ -23,7 +23,7 @@
 
   <!-- Pack README -->
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="docs" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="docs" Visible="false" />
   </ItemGroup>
   
   <!-- NuGet package properties and project info -->
