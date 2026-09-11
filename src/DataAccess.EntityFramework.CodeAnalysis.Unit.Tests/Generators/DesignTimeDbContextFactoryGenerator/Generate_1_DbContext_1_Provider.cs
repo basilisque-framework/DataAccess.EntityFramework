@@ -74,7 +74,7 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
 
     protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
     {
-        yield return "DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext";
+        yield break;
     }
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()

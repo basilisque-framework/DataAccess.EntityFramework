@@ -95,7 +95,7 @@ public class MyDbContext : CustomBaseDbContext<MyDbContext>
 
     protected override IEnumerable<string> GetExpectedDbContextDependencyInjectionRegistrations()
     {
-        yield return "DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext";
+        yield break;
     }
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()

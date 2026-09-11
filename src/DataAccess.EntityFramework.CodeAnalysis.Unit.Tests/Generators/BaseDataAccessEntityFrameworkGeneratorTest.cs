@@ -340,8 +340,16 @@ public partial class DependencyRegistrator
             ));
     }
 
-    private static void addDependencyInjectionExtensionMigrationAssemblyProvider(List<(string Name, string SourceText)> result)
+    protected virtual bool ExpectMigrationAssemblyProviderDependencyInjectionExtension()
     {
+        return true;
+    }
+
+    private void addDependencyInjectionExtensionMigrationAssemblyProvider(List<(string Name, string SourceText)> result)
+    {
+        if (!ExpectMigrationAssemblyProviderDependencyInjectionExtension())
+            return;
+
         if (result.Count <= 0)
             return;
 

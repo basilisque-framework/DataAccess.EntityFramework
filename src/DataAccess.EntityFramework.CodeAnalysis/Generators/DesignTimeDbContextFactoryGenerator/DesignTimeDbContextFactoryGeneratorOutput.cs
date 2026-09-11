@@ -32,24 +32,31 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
 
     internal static void OutputImplementations(SourceProductionContext context, ((DesignTimeDbContextFactoryGeneratorInfo GeneratorInfo, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
     {
-        if (!data.Input.BuildProperties.IsMigrationAssembly)
+        if (!checkPreconditions(registrationOptions))
             return;
 
-        if (!checkPreconditions(registrationOptions))
+        var dbContexts = data.Input.GeneratorInfo.DbContexts;
+
+        var sourceDbContexts = dbContexts.Where(dbContextSymbol => dbContextSymbol.Locations.Any(location => location.IsInSource)).ToImmutableArray();
+
+        if (sourceDbContexts.Length > 0)
+        {
+            var diExtensionData = (sourceDbContexts, data.DIInfo);
+            DependencyInjectionExtensionGeneratorOutput.OutputImplementations(context, diExtensionData, registrationOptions, "BAS_DA_EF_DIExt_DBC", registerExtensionCallback: outputDependencyInjectionExtension);
+        }
+
+        if (!data.Input.BuildProperties.IsMigrationAssembly)
             return;
 
         var baseDesignTimeFactoryFQNames = getActiveDesignTimeFactories(data.Input.GeneratorInfo.DesignTimeFactories, data.Input.BuildProperties.DesignTimeDbContextFactories);
 
-        if (baseDesignTimeFactoryFQNames.Length < 1 || data.Input.GeneratorInfo.DbContexts.Length < 1)
+        if (baseDesignTimeFactoryFQNames.Length < 1 || dbContexts.Length < 1)
             return;
 
         if (data.Input.GeneratorInfo.DesignTimeFactories.Length > 1)
-            outputMultipleProviders(context, registrationOptions, data.Input.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
+            outputMultipleProviders(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
         else
-            outputSingleProvider(context, registrationOptions, data.Input.GeneratorInfo.DbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);
-
-        var diExtensionData = (data.Input.GeneratorInfo.DbContexts, data.DIInfo);
-        DependencyInjectionExtensionGeneratorOutput.OutputImplementations(context, diExtensionData, registrationOptions, "BAS_DA_EF_DIExt_DBC", registerExtensionCallback: outputDependencyInjectionExtension);
+            outputSingleProvider(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);
     }
 
     private static ImmutableArray<string> getActiveDesignTimeFactories(ImmutableArray<INamedTypeSymbol> designTimeFactories, string[]? designTimeDbContextFactories)
