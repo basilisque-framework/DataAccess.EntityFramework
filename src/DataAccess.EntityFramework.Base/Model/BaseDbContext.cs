@@ -1,5 +1,5 @@
 /*
-   Copyright 2025 Alexander Stärk
+   Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -124,6 +124,14 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
             ConfigureDesignTimeConventions(configurationBuilder);
     }
 
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        ConfigureVersion7GuidKeyGeneration(modelBuilder);
+    }
+
     /// <summary>
     ///     Override this method to set defaults and configure conventions for design time before they run. This method is invoked before <see cref="DbContext.OnModelCreating" />.
     /// </summary>
@@ -162,6 +170,43 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
     /// <returns>An enumerable collection of strings, each representing a name of a database script. The collection may be empty if no scripts are provided.</returns>
     protected virtual IEnumerable<string> GetDbScripts(string? providerDirectoryName)
     { /* for overriding purposes only */ yield break; }
+
+    /// <summary>
+    /// Configures Guid v7 value generation for entity primary keys with a single key property named "Id".
+    /// </summary>
+    /// <param name="modelBuilder">The model builder being used to configure the entity.</param>
+    protected virtual void ConfigureVersion7GuidKeyGeneration(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var primaryKey = entityType.FindPrimaryKey();
+
+            if (primaryKey?.Properties.Count != 1)
+                continue;
+
+            var keyProperty = primaryKey.Properties[0];
+
+            if (keyProperty.ClrType != typeof(Guid) || keyProperty.Name != "Id")
+                continue;
+
+            ConfigureVersion7GuidKeyGeneration(modelBuilder, entityType, keyProperty);
+        }
+    }
+
+    /// <summary>
+    /// Configures Guid v7 value generation for a specific entity type and key property.
+    /// </summary>
+    /// <param name="modelBuilder">The model builder being used to configure the entity.</param>
+    /// <param name="entityType">The entity type for which to configure the key property.</param>
+    /// <param name="keyProperty">The key property to configure.</param>
+    protected virtual void ConfigureVersion7GuidKeyGeneration(ModelBuilder modelBuilder, Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entityType, Microsoft.EntityFrameworkCore.Metadata.IMutableProperty keyProperty)
+    {
+        modelBuilder
+            .Entity(entityType.ClrType)
+            .Property<Guid>(keyProperty.Name)
+            .ValueGeneratedOnAdd()
+            .HasValueGenerator<GuidVersion7ValueGenerator>();
+    }
 
     private string toValidDirectoryName(string? name, char replacementChar = '_')
     {
