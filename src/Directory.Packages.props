@@ -23,8 +23,8 @@
     <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.0" />
     <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.0" />
     <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-Preview00008" />
-    <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-Preview00016" />
-    <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-Preview00016" />
+    <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-Preview00017" />
+    <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-Preview00017" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
