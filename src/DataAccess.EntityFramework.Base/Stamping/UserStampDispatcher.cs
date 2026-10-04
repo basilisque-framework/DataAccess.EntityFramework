@@ -16,39 +16,41 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
 namespace Basilisque.DataAccess.EntityFramework.Base.Stamping;
 
 internal sealed class UserStampDispatcher : IStampHandler
 {
-    private static readonly ConditionalWeakTable<IModel, Type[]> _handlerTypes = new();
-    private readonly IServiceProvider _serviceProvider;
+    private static readonly ConditionalWeakTable<IModel, Type[]> _keyTypes = new();
+    private readonly Dictionary<Type, IUserStampHandler> _handlers = new();
 
-    public UserStampDispatcher(IServiceProvider serviceProvider)
+    public UserStampDispatcher(IEnumerable<IUserStampHandler> handlers)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(handlers);
 
-        _serviceProvider = serviceProvider;
+        foreach (var handler in handlers)
+            _handlers[handler.UserKeyType] = handler;
     }
 
     public void UpdateStampProperties(DbContext context, DateTimeOffset timestamp)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var handlerTypes = _handlerTypes.GetValue(context.Model, static model => model.GetEntityTypes()
+        var keyTypes = _keyTypes.GetValue(context.Model, static model => model.GetEntityTypes()
             .SelectMany(entityType => entityType.GetProperties())
             .Where(property => property.GetStampPropertyKind() is StampPropertyKind.CreatedBy or StampPropertyKind.ModifiedBy)
             .Select(property => property.ClrType)
             .Distinct()
-            .Select(keyType => typeof(IUserStampHandler<>).MakeGenericType(keyType))
             .ToArray());
 
-        foreach (var handlerType in handlerTypes)
+        foreach (var keyType in keyTypes)
         {
-            var handler = (IStampHandler)_serviceProvider.GetRequiredService(handlerType);
-            handler.UpdateStampProperties(context, timestamp);
+            if (!_handlers.ContainsKey(keyType))
+                throw new InvalidOperationException($"No user stamp handler is registered for key type '{keyType.FullName}'. Register a scoped {nameof(IUserStampHandler)} with {nameof(IUserStampHandler.UserKeyType)} equal to this type, for example a closed UserStampHandler<TKey>, after the generated registration chain.");
         }
+
+        foreach (var keyType in keyTypes)
+            _handlers[keyType].UpdateStampProperties(context, timestamp);
     }
 }

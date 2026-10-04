@@ -86,8 +86,8 @@ Entities implementing the interfaces in `Basilisque.DataAccess.EntityFramework.B
 can receive creation and modification timestamps and user IDs.
 
 The generated dependency-registration chain registers the scoped stamping interceptor,
-the timestamp handler, and a user-stamp dispatcher with open generic
-`IUserStampHandler<TKey>` / `UserStampHandler<TKey>` registration. It also registers the
+the timestamp handler, and a user-stamp dispatcher with closed handlers for `Guid`,
+`string`, `int`, and `long`. It also registers the
 Core user-context services through the library's dependencies; no separate Core
 registration is required.
 
@@ -109,11 +109,18 @@ The `IDbProviderServiceProvider` wrapper is transient so each context resolves t
 interceptor and user context from its own scope. Singleton connection-string builders
 only use the wrapper's configuration-section metadata.
 
-Core already provides user contexts for other key types through its open generic
-registrations. The dispatcher discovers the user-key types from configured CLR and
-shadow stamp properties in the EF model and resolves their handlers from the current
-scope. No additional handler registration is needed for string, int, or other
-supported user-key types. For example, set the current string user in the context's scope:
+Core provides user contexts through its open generic registrations. For the four
+standard key types, the EF registration additionally supplies closed, typed factories
+for the default Core context and its read/write proxies. They share the same scoped
+`WritableUserContext<TKey>` instance; existing closed registrations are preserved.
+If the open generic Core implementation has already been customized, its registration
+is retained instead of adding a closed default. Later customizations for standard
+key types should replace the corresponding closed registrations.
+
+The dispatcher discovers the user-key types from configured CLR and shadow stamp
+properties in the EF model and selects handlers from `IEnumerable<IUserStampHandler>`
+in the current scope. It does not construct generic types dynamically.
+For example, set the current string user in the context's scope:
 
 ```csharp
 using Basilisque.Core.Auth;
@@ -122,16 +129,38 @@ using Microsoft.Extensions.DependencyInjection;
 scope.ServiceProvider.GetRequiredService<IWritableUserContext<string>>().UserId = "user-123";
 ```
 
-Applications can replace a handler for a specific key type by registering a closed
-`IUserStampHandler<TKey>` implementation.
+For another key type, explicitly register a closed handler under the non-generic
+`IUserStampHandler` interface after the generated registration chain:
+
+```csharp
+using Basilisque.DataAccess.EntityFramework.Base.Stamping;
+
+services.AddScoped<IUserStampHandler>(sp =>
+    new UserStampHandler<MyUserId>(sp.GetRequiredService<IUserContext<MyUserId>>()));
+```
+
+The corresponding `IUserContext<MyUserId>` must also be available. Core's open generic
+services support it in normal .NET deployments; Native AOT deployments must provide
+statically reachable closed context/proxy registrations for custom key types.
+Registering only `IUserStampHandler<MyUserId>` does not add it to the dispatcher's
+non-generic handler collection.
+
+Applications can replace a standard handler by adding an `IUserStampHandler` with
+the same `UserKeyType` after the default registrations. The last registration for
+each key type wins and is invoked once per save. If any configured user-key type has
+no handler, saving throws an explicit exception identifying the missing key type
+and the registration contract.
 Registration of custom user-context implementations, proxies, or convenience
 interfaces is the application's responsibility.
 
 Design-time factories register the interceptor independently and do not require
 application user-context services. No stamp handlers are registered by default at
 design time, so explicitly supplied seed values are not overwritten by stamping.
-The runtime dispatcher dynamically closes generic handler types; Native AOT and
-trimmed deployments require separate compatibility validation.
+The standard handler and generic Core context/proxy factories use statically closed
+types. This removes dynamic generic construction from user-stamp dispatch, but does
+not establish Native AOT or trimming compatibility for EF model creation, queries,
+providers, or the complete library. Those deployments require separate publish and
+execution validation.
 
 ### Design-time service lifetimes
 Each `BaseDesignTimeDbContextFactory<TDbContext>.CreateDbContext` call creates its own

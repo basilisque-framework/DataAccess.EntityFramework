@@ -17,10 +17,12 @@
 namespace Basilisque.DataAccess.EntityFramework.Base.Stamping;
 
 /// <summary>
-/// Updates user stamp properties with keys of type <typeparamref name="TKey"/>.
+/// Updates user stamp properties for a specific key type.
 /// </summary>
-/// <typeparam name="TKey">The type of the user key.</typeparam>
-public interface IUserStampHandler<TKey> : IUserStampHandler
-    where TKey : notnull
+public interface IUserStampHandler : IStampHandler
 {
+    /// <summary>
+    /// Gets the CLR type of the user keys handled by this instance.
+    /// </summary>
+    Type UserKeyType { get; }
 }

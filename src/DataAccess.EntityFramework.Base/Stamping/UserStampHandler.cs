@@ -29,6 +29,9 @@ public sealed class UserStampHandler<TKey> : IUserStampHandler<TKey>
 {
     private readonly IUserContext<TKey> _userContext;
 
+    /// <inheritdoc />
+    public Type UserKeyType => typeof(TKey);
+
     /// <summary>
     /// Creates a new user stamp handler.
     /// </summary>

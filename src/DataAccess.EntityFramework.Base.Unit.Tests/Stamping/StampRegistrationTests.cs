@@ -20,6 +20,7 @@ using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
 using Basilisque.DataAccess.EntityFramework.Base.Stamping;
+using Basilisque.DependencyInjection.Registration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,7 @@ public class StampRegistrationTests
         public DbSet<StampedEntity> Entities => Set<StampedEntity>();
         public DbSet<StringStampedEntity> StringEntities => Set<StringStampedEntity>();
         public DbSet<ShadowStampedEntity> ShadowEntities => Set<ShadowStampedEntity>();
+        public DbSet<LongStampedEntity> LongEntities => Set<LongStampedEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,14 +70,56 @@ public class StampRegistrationTests
         public Guid Id { get; set; }
     }
 
+    private sealed class LongStampedEntity : IStampCreateUser<long>, IStampModifyUser<long>
+    {
+        public Guid Id { get; set; }
+        public long CreatedBy { get; set; }
+        public long ModifiedBy { get; set; }
+    }
+
+    private sealed class SpecialKeyEntity : IStampCreateUser<decimal>, IStampModifyUser<decimal>
+    {
+        public Guid Id { get; set; }
+        public decimal CreatedBy { get; set; }
+        public decimal ModifiedBy { get; set; }
+    }
+
+    private sealed class SpecialShadowEntity
+    {
+        public Guid Id { get; set; }
+    }
+
+    private sealed class SpecialKeyDbContext : BaseDbContext<SpecialKeyDbContext>
+    {
+        public SpecialKeyDbContext(IDbProviderServiceProvider serviceProvider) : base(serviceProvider)
+        { }
+
+        public DbSet<SpecialKeyEntity> Entities => Set<SpecialKeyEntity>();
+        public DbSet<SpecialShadowEntity> ShadowEntities => Set<SpecialShadowEntity>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SpecialShadowEntity>()
+                .UseShadowCreationStamp<SpecialShadowEntity, decimal>()
+                .UseShadowModificationStamp<SpecialShadowEntity, decimal>();
+        }
+    }
+
     private sealed class CustomStringHandler : IUserStampHandler<string>
     {
+        public Type UserKeyType => typeof(string);
         public int InvocationCount { get; private set; }
 
         public void UpdateStampProperties(DbContext context, DateTimeOffset timestamp)
         {
             InvocationCount++;
         }
+    }
+
+    private sealed class CustomUserContext<TKey> : WritableUserContext<TKey>
+        where TKey : notnull
+    {
     }
 
     private sealed class InMemoryConfigurator : BaseDbContextOptionsConfigurator
@@ -114,8 +158,69 @@ public class StampRegistrationTests
 
         await Assert.That(handlers.OfType<TimestampStampHandler>().Count()).IsEqualTo(1);
         await Assert.That(handlers.Length).IsEqualTo(2);
-        await Assert.That(scope.ServiceProvider.GetRequiredService<IUserStampHandler<Guid>>() is UserStampHandler<Guid>).IsTrue();
-        await Assert.That(scope.ServiceProvider.GetRequiredService<IUserStampHandler<string>>() is UserStampHandler<string>).IsTrue();
+        var userHandlers = scope.ServiceProvider.GetServices<IUserStampHandler>().ToArray();
+        await Assert.That(userHandlers.Length).IsEqualTo(4);
+        await Assert.That(userHandlers.OfType<UserStampHandler<Guid>>().Count()).IsEqualTo(1);
+        await Assert.That(userHandlers.OfType<UserStampHandler<string>>().Count()).IsEqualTo(1);
+        await Assert.That(userHandlers.OfType<UserStampHandler<int>>().Count()).IsEqualTo(1);
+        await Assert.That(userHandlers.OfType<UserStampHandler<long>>().Count()).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task Repeated_registration_keeps_four_closed_user_handler_factories()
+    {
+        var services = new ServiceCollection();
+        Basilisque.DataAccess.EntityFramework.Base.IServiceCollectionExtensions.RegisterServices(services);
+        Basilisque.DataAccess.EntityFramework.Base.IServiceCollectionExtensions.RegisterServices(services);
+        var handlers = services.Where(descriptor => descriptor.ServiceType == typeof(IUserStampHandler)).ToArray();
+
+        await Assert.That(handlers.Length).IsEqualTo(4);
+        foreach (var handler in handlers)
+            await Assert.That(handler.ImplementationFactory).IsNotNull();
+
+        foreach (var serviceType in new[]
+        {
+            typeof(WritableUserContext<Guid>), typeof(IUserContext<Guid>), typeof(IWritableUserContext<Guid>),
+            typeof(WritableUserContext<string>), typeof(IUserContext<string>), typeof(IWritableUserContext<string>),
+            typeof(WritableUserContext<int>), typeof(IUserContext<int>), typeof(IWritableUserContext<int>),
+            typeof(WritableUserContext<long>), typeof(IUserContext<long>), typeof(IWritableUserContext<long>)
+        })
+        {
+            var descriptor = services.Last(item => item.ServiceType == serviceType);
+            await Assert.That(descriptor.ImplementationFactory).IsNotNull();
+        }
+    }
+
+    [Test]
+    public async Task Standard_registration_preserves_an_explicit_closed_user_context()
+    {
+        var customContext = new WritableUserContext<string> { UserId = "custom" };
+        using var provider = createProvider(configureBeforeRegistration: services =>
+            services.AddScoped<IUserContext<string>>(_ => customContext));
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<StampingDbContext>();
+        var entity = new StringStampedEntity();
+        context.Add(entity);
+
+        await context.SaveChangesAsync();
+
+        await Assert.That(scope.ServiceProvider.GetRequiredService<IUserContext<string>>()).IsSameReferenceAs(customContext);
+        await Assert.That(entity.CreatedBy).IsEqualTo("custom");
+        await Assert.That(entity.ModifiedBy).IsEqualTo("custom");
+    }
+
+    [Test]
+    public async Task Standard_registration_does_not_shadow_a_custom_open_generic_core_context()
+    {
+        var services = new ServiceCollection();
+        Basilisque.Core.IServiceCollectionExtensions.RegisterServices(services);
+        services.AddScoped(typeof(IUserContext<>), typeof(CustomUserContext<>));
+        IDependencyRegistrator registrator = new Basilisque.DataAccess.EntityFramework.Base.DependencyRegistrator();
+        registrator.RegisterServices(services);
+
+        await Assert.That(services.Any(descriptor => descriptor.ServiceType == typeof(IUserContext<string>))).IsFalse();
+        await Assert.That(services.Last(descriptor => descriptor.ServiceType == typeof(IUserContext<>)).ImplementationType)
+            .IsEqualTo(typeof(CustomUserContext<>));
     }
 
     [Test]
@@ -197,11 +302,13 @@ public class StampRegistrationTests
         services.GetRequiredService<IWritableUserContext<Guid>>().UserId = guid;
         services.GetRequiredService<IWritableUserContext<string>>().UserId = "creator";
         services.GetRequiredService<IWritableUserContext<int>>().UserId = 42;
+        services.GetRequiredService<IWritableUserContext<long>>().UserId = 5_000_000_000;
         var context = services.GetRequiredService<StampingDbContext>();
         var guidEntity = new StampedEntity();
         var stringEntity = new StringStampedEntity();
         var shadowEntity = new ShadowStampedEntity();
-        context.AddRange(guidEntity, stringEntity, shadowEntity);
+        var longEntity = new LongStampedEntity();
+        context.AddRange(guidEntity, stringEntity, shadowEntity, longEntity);
 
         context.SaveChanges();
 
@@ -210,6 +317,8 @@ public class StampRegistrationTests
         await Assert.That(stringEntity.ModifiedBy).IsEqualTo("creator");
         await Assert.That(context.Entry(shadowEntity).Property<int>("CreatedBy").CurrentValue).IsEqualTo(42);
         await Assert.That(context.Entry(shadowEntity).Property<int>("ModifiedBy").CurrentValue).IsEqualTo(42);
+        await Assert.That(longEntity.CreatedBy).IsEqualTo(5_000_000_000);
+        await Assert.That(longEntity.ModifiedBy).IsEqualTo(5_000_000_000);
 
         services.GetRequiredService<IWritableUserContext<string>>().UserId = "modifier";
         stringEntity.Name = "Updated";
@@ -244,14 +353,70 @@ public class StampRegistrationTests
     [Test]
     public async Task Dispatcher_uses_a_custom_closed_handler_once_per_save()
     {
-        using var provider = createProvider(services => services.AddScoped<IUserStampHandler<string>, CustomStringHandler>());
+        using var provider = createProvider(services => services.AddScoped<IUserStampHandler, CustomStringHandler>());
         using var scope = provider.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IWritableUserContext<string>>().UserId = "default";
         var context = scope.ServiceProvider.GetRequiredService<StampingDbContext>();
-        context.Add(new StringStampedEntity());
+        var entity = new StringStampedEntity { CreatedBy = "explicit", ModifiedBy = "explicit" };
+        context.Add(entity);
         await context.SaveChangesAsync();
 
-        var handler = (CustomStringHandler)scope.ServiceProvider.GetRequiredService<IUserStampHandler<string>>();
+        var handler = scope.ServiceProvider.GetServices<IUserStampHandler>().OfType<CustomStringHandler>().Single();
         await Assert.That(handler.InvocationCount).IsEqualTo(1);
+        await Assert.That(entity.CreatedBy).IsEqualTo("explicit");
+        await Assert.That(entity.ModifiedBy).IsEqualTo("explicit");
+    }
+
+    [Test]
+    public async Task Missing_special_key_handler_reports_the_key_type_and_registration_contract()
+    {
+        using var provider = createProvider();
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SpecialKeyDbContext>();
+        context.Add(new SpecialKeyEntity());
+
+        var exception = await Assert.That(() => context.SaveChanges()).Throws<InvalidOperationException>()
+            ?? throw new InvalidOperationException("Expected the missing-handler exception.");
+        await Assert.That(exception.Message).Contains(typeof(decimal).ToString());
+        await Assert.That(exception.Message).Contains(nameof(IUserStampHandler));
+    }
+
+    [Test]
+    public async Task Explicit_special_key_handler_stamps_using_the_shared_core_context()
+    {
+        using var provider = createProvider(services =>
+            services.AddScoped<IUserStampHandler>(sp =>
+                new UserStampHandler<decimal>(sp.GetRequiredService<IUserContext<decimal>>())));
+        using var scope = provider.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IWritableUserContext<decimal>>().UserId = 123m;
+        var context = scope.ServiceProvider.GetRequiredService<SpecialKeyDbContext>();
+        var entity = new SpecialKeyEntity();
+        var shadowEntity = new SpecialShadowEntity();
+        context.AddRange(entity, shadowEntity);
+
+        await context.SaveChangesAsync();
+
+        await Assert.That(entity.CreatedBy).IsEqualTo(123m);
+        await Assert.That(entity.ModifiedBy).IsEqualTo(123m);
+        await Assert.That(context.Entry(shadowEntity).Property<decimal>("CreatedBy").CurrentValue).IsEqualTo(123m);
+        await Assert.That(context.Entry(shadowEntity).Property<decimal>("ModifiedBy").CurrentValue).IsEqualTo(123m);
+    }
+
+    [Test]
+    public async Task Standard_core_interfaces_and_guid_convenience_interfaces_share_the_same_state()
+    {
+        using var provider = createProvider();
+        using var scope = provider.CreateScope();
+        var services = scope.ServiceProvider;
+        var guid = Guid.NewGuid();
+        services.GetRequiredService<IWritableUserContext>().UserId = guid;
+        services.GetRequiredService<IWritableUserContext<long>>().UserId = 5_000_000_000;
+
+        await Assert.That(services.GetRequiredService<IUserContext>().UserId).IsEqualTo(guid);
+        await Assert.That(services.GetRequiredService<IUserContext<Guid>>().UserId).IsEqualTo(guid);
+        await Assert.That(services.GetRequiredService<WritableUserContext<Guid>>().UserId).IsEqualTo(guid);
+        await Assert.That(services.GetRequiredService<IUserContext<long>>().UserId).IsEqualTo(5_000_000_000);
+        await Assert.That(services.GetRequiredService<WritableUserContext<long>>().UserId).IsEqualTo(5_000_000_000);
     }
 
     [Test]
@@ -288,13 +453,16 @@ public class StampRegistrationTests
         await Assert.That(entity.ModifiedBy).IsEqualTo(userId);
     }
 
-    private static ServiceProvider createProvider(Action<IServiceCollection>? configureServices = null)
+    private static ServiceProvider createProvider(Action<IServiceCollection>? configureServices = null,
+        Action<IServiceCollection>? configureBeforeRegistration = null)
     {
         var services = new ServiceCollection();
+        configureBeforeRegistration?.Invoke(services);
         Basilisque.DataAccess.EntityFramework.Base.IServiceCollectionExtensions.RegisterServices(services);
         services.AddSingleton<IConfiguration>(createConfiguration());
         services.AddSingleton<IDbContextOptionsConfigurator, InMemoryConfigurator>();
         services.AddDbContext<StampingDbContext>();
+        services.AddDbContext<SpecialKeyDbContext>();
         configureServices?.Invoke(services);
 
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
