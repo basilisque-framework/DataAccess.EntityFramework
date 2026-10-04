@@ -38,7 +38,6 @@ public sealed class TimestampStampHandler : IStampHandler
         if (entry.State == EntityState.Added)
         {
             updateAddedEntry(entry, timestamp);
-            return;
         }
 
         if (entry.State == EntityState.Modified)

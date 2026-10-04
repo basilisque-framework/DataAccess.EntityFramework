@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Threading;
@@ -57,10 +58,13 @@ public sealed class CompositeStampInterceptor : SaveChangesInterceptor
 
     private void updateStampProperties(DbContext? context)
     {
-        if (context is null || StampSuppressor.IsSuppressed)
+        if (context is null)
             return;
 
         var timestamp = DateTimeOffset.UtcNow;
+        SoftDeleteProcessor.Apply(context, timestamp);
+        if (StampSuppressor.IsSuppressed)
+            return;
 
         foreach (var handler in _handlers)
             handler.UpdateStampProperties(context, timestamp);

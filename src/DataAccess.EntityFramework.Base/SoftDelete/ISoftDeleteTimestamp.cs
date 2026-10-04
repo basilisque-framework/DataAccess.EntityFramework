@@ -14,13 +14,20 @@
    limitations under the License.
 */
 
-namespace Basilisque.DataAccess.EntityFramework.Base.Stamping;
+namespace Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 
-internal enum StampPropertyKind
+/// <summary>
+/// Defines soft deletion using only a nullable deletion time.
+/// </summary>
+public interface ISoftDeleteTimestamp
 {
-    CreatedAt,
-    CreatedBy,
-    ModifiedAt,
-    ModifiedBy,
-    DeletedBy
+    /// <summary>
+    /// Gets or sets the UTC deletion time, or null when not deleted.
+    /// </summary>
+    DateTimeOffset? DeletedAt { get; set; }
+
+    /// <summary>
+    /// Gets whether the entity has been deleted. This convenience property is not persisted.
+    /// </summary>
+    bool IsDeleted => DeletedAt.HasValue;
 }

@@ -15,6 +15,7 @@
 */
 
 using Basilisque.Core.Auth;
+using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -61,11 +62,13 @@ public sealed class UserStampHandler<TKey> : IUserStampHandler<TKey>
         {
             setUser(entry, StampPropertyKind.CreatedBy, userId);
             setUser(entry, StampPropertyKind.ModifiedBy, userId);
-            return;
         }
 
         if (entry.State == EntityState.Modified && entry.HasMeaningfulModification())
             setUser(entry, StampPropertyKind.ModifiedBy, userId);
+
+        if (entry.IsSoftDeletion())
+            setUser(entry, StampPropertyKind.DeletedBy, userId);
     }
 
     private static void setUser(EntityEntry entry, StampPropertyKind propertyKind, TKey userId)
@@ -76,6 +79,8 @@ public sealed class UserStampHandler<TKey> : IUserStampHandler<TKey>
 
     private static bool isUserProperty(PropertyEntry property, StampPropertyKind propertyKind)
     {
-        return property.Metadata.GetStampPropertyKind() == propertyKind && property.Metadata.ClrType == typeof(TKey);
+        return property.Metadata.GetStampPropertyKind() == propertyKind &&
+            (property.Metadata.ClrType == typeof(TKey) ||
+             (propertyKind == StampPropertyKind.DeletedBy && Nullable.GetUnderlyingType(property.Metadata.ClrType) == typeof(TKey)));
     }
 }

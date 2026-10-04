@@ -39,8 +39,9 @@ internal sealed class UserStampDispatcher : IStampHandler
 
         var keyTypes = _keyTypes.GetValue(context.Model, static model => model.GetEntityTypes()
             .SelectMany(entityType => entityType.GetProperties())
-            .Where(property => property.GetStampPropertyKind() is StampPropertyKind.CreatedBy or StampPropertyKind.ModifiedBy)
-            .Select(property => property.ClrType)
+            .Where(property => property.GetStampPropertyKind() is StampPropertyKind.CreatedBy or StampPropertyKind.ModifiedBy or StampPropertyKind.DeletedBy)
+            .Select(property => (property.GetStampPropertyKind() == StampPropertyKind.DeletedBy
+                ? Nullable.GetUnderlyingType(property.ClrType) : null) ?? property.ClrType)
             .Distinct()
             .ToArray());
 

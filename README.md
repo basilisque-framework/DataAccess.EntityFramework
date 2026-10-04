@@ -162,6 +162,139 @@ not establish Native AOT or trimming compatibility for EF model creation, querie
 providers, or the complete library. Those deployments require separate publish and
 execution validation.
 
+## Soft delete
+Soft deletion is opt-in. `ISoftDelete` is the default and provides
+`DateTimeOffset? DeletedAt` and `Guid? DeletedBy`. Use `ISoftDelete<TKey>` for other
+value-type user keys, such as `int` or `long`, and `ISoftDeleteOfRef<TKey>` for
+reference-type keys, such as `string`. Both variants have nullable user keys.
+Use `ISoftDeleteTimestamp` when only the deletion time is needed.
+
+`DeletedAt` is the sole source of deletion state: null means active, non-null means
+deleted. The interfaces provide a read-only, calculated `IsDeleted` convenience
+property; no separate flag is persisted. Default interface members are accessed
+through the interface unless the entity also declares its own calculated property.
+In LINQ queries, use `DeletedAt`, not the calculated `IsDeleted` property.
+
+```csharp
+using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
+using Basilisque.DataAccess.EntityFramework.Base.Stamping;
+
+public class Document : ISoftDelete, IStampChanges
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public DateTimeOffset? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public Guid CreatedBy { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
+    public Guid ModifiedBy { get; set; }
+}
+```
+
+`BaseDbContext<TDbContext>` configures soft deletion during model finalization, after
+application model configuration. The existing save interceptor converts tracked
+`Remove` and `RemoveRange` operations into updates of the deletion time. Creation
+stamps and unrelated stored columns are preserved, including when deleting an
+attached stub containing only its key.
+
+The deletion time is functional state and is set independently of audit stamping.
+The deleting user is populated by the existing stamp handlers and scoped Core user contexts.
+`Guid`, `string`, `int`, and `long` work without extra handler registration; other
+user-key types use the same explicit `IUserStampHandler` registration as ordinary
+stamping. Nullable deletion keys use the underlying key type for dispatch and user
+contexts: for example, `Guid? DeletedBy` uses `UserStampHandler<Guid>` and
+`IUserContext<Guid>`, not a separate nullable-key context.
+With modification stamps configured, soft deletion sets `ModifiedAt`
+and `ModifiedBy` too, using the same timestamp/user as a `Remove` deletion. Without a
+current user, the deletion still works and `DeletedBy` can remain null. Active rows
+have null deletion time and user values. Repeating a
+soft delete on an already deleted, loaded entity does not change its deletion audit.
+Setting `DeletedAt` directly also soft-deletes an entity and preserves the supplied
+time rather than replacing it with the save time.
+
+Shadow properties are supported:
+
+```csharp
+modelBuilder.Entity<DocumentWithoutInterfaces>()
+    .UseShadowSoftDelete<DocumentWithoutInterfaces, Guid>();
+```
+
+Use `UseShadowSoftDelete()` for the default nullable Guid user key,
+`UseShadowSoftDeleteOfRef<TEntity, string>()` for a nullable string user key, or
+`UseShadowSoftDeleteTimestamp()` for only the deletion time.
+Ordinary DbContexts must call `modelBuilder.ApplySoftDeleteConfigurations()`
+after their application model configuration and install the existing
+`UseEFCoreStamping(serviceProvider)` interceptor.
+
+### Querying deleted data
+The named `Basilisque:SoftDelete` filter excludes deleted rows from LINQ queries.
+Disable only this filter to keep application filters, such as tenant isolation:
+
+```csharp
+var includingDeleted = context.Set<Document>()
+    .IgnoreQueryFilters([SoftDeleteModelBuilderExtensions.QueryFilterName]);
+```
+
+Existing named filters are preserved. Anonymous application filters are retained
+under the reserved name `Basilisque:ApplicationQueryFilter`, because EF Core cannot
+combine anonymous and named filters. `IgnoreQueryFilters()` without names disables
+all filters, including tenant filters; use it with care.
+
+Query filters are not an authorization boundary. Already tracked entities, `Local`,
+and cached results from `Find` are not hidden by a filter. EF's normal required-
+navigation/filter behavior also applies.
+
+### Physical deletion and restore
+To physically delete an opted-in entity, explicitly allow hard deletion around
+the save operation:
+
+```csharp
+using (SoftDeleteSuppressor.AllowHardDelete())
+{
+    context.Remove(document);
+    await context.SaveChangesAsync();
+}
+```
+
+The bypass supports nested scopes and flows across awaits. It does not disable
+query filters. `StampSuppressor.Suppress()` suppresses user and creation/modification
+stamping, not soft deletion: the deletion time is still set and the row is retained
+and hidden. Non-opted-in entities keep normal EF deletion
+behavior.
+
+To restore an entity, load it with the soft-delete filter disabled, set `DeletedAt`
+to null, and save. `DeletedBy` is cleared automatically, including with stamping
+suppressed. Modification stamps update unless suppressed. No deletion history is
+retained; historical auditing is a separate concern.
+
+### Relationships and limitations
+Soft deletion does not cascade to related entities. Owned data is retained with
+its owner. Tracked cascade deletions or foreign-key changes on other dependents
+are rejected before saving rather than physically deleting, soft deleting, or
+severing relationships implicitly. Configure tracked relationships with
+`DeleteBehavior.ClientNoAction` and handle dependents explicitly. Explicitly disabling
+`CascadeDeleteTiming` is respected; deferred cascades are validated without forcing
+unrelated orphan processing. Unloaded dependents are not affected by the update.
+
+Configure inheritance on the root entity. Owned types cannot independently opt in.
+All writable CLR interface properties must be mapped. A calculated `IsDeleted`
+property must not be mapped; explicitly ignore it if it was previously configured.
+Custom user-key types may require an EF value converter. Add a migration for the new
+nullable persisted properties.
+
+Soft deletion intercepts tracked `SaveChanges` operations only. `ExecuteDelete`,
+`ExecuteUpdate`, raw SQL, and external database writers bypass the interceptor and
+its audit logic. Do not use those APIs for audited soft deletion without implementing
+the equivalent updates explicitly.
+
+Design-time contexts keep the model filter and removal conversion, including setting
+the deletion time for `Remove`. Their default interceptor has no stamp handlers, so
+user and creation/modification values are not automatically stamped. Explicitly
+supplied deletion times are preserved; active entities have their deletion user
+cleared. Native AOT/trimming compatibility
+of model configuration and the EF provider still requires separate validation.
+
 ### Design-time service lifetimes
 Each `BaseDesignTimeDbContextFactory<TDbContext>.CreateDbContext` call creates its own
 service provider and scope. The returned context owns both until it is disposed;

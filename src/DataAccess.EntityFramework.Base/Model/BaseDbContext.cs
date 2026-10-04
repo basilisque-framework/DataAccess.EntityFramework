@@ -17,6 +17,7 @@
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
@@ -169,6 +170,7 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.Conventions.Add(_ => new SoftDeleteConvention());
 
         if (IsDesignTime)
             ConfigureDesignTimeConventions(configurationBuilder);
