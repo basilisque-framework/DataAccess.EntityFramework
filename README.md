@@ -133,5 +133,22 @@ design time, so explicitly supplied seed values are not overwritten by stamping.
 The runtime dispatcher dynamically closes generic handler types; Native AOT and
 trimmed deployments require separate compatibility validation.
 
+### Design-time service lifetimes
+Each `BaseDesignTimeDbContextFactory<TDbContext>.CreateDbContext` call creates its own
+service provider and scope. The returned context owns both until it is disposed;
+subsequent calls and different factory instances do not share configuration or services.
+Use `using` or `await using` for contexts created manually. Use `await using` if
+their services require asynchronous disposal.
+
+`BaseDbContext<TDbContext>` implements this ownership automatically. Derived contexts
+that override `Dispose` or `DisposeAsync` must call the corresponding base method.
+Contexts outside this hierarchy must implement `IDbContextDesignTimeLifetimeOwner`.
+Its `SetDesignTimeServiceLifetime` method accepts an `IDesignTimeServiceLifetime`
+which must be stored exactly once and detached before disposal. After disposing the
+context itself, dispose that lifetime in a `finally` block, using `DisposeAsync`
+in the asynchronous path. Detaching first prevents recursive disposal because the
+service scope also tracks the context. Contexts without this contract are rejected
+with an explicit exception; failed creation releases the newly created services.
+
 ## License
 The Basilisque framework (including this repository) is licensed under the [Apache License, Version 2.0](LICENSE.txt).

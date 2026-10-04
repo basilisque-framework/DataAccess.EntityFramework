@@ -1,5 +1,5 @@
 /*
-   Copyright 2025-2026 Alexander St‰rk
+   Copyright 2025-2026 Alexander St√§rk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,19 +20,22 @@ using Basilisque.DataAccess.EntityFramework.Base.Provider;
 using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>
 /// A base class with common functionality for DbContexts
 /// </summary>
-public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbContext, IDbContextDesignSupport
+public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbContext, IDbContextDesignSupport, IDbContextDesignTimeLifetimeOwner
     where TDbContext : BaseDbContext<TDbContext>
 {
     private static bool _wasAlreadyMigrated = false;
     private readonly IDbProviderServiceProvider _dbProviderServiceProvider;
     private IDbContextOptionsConfigurator? _dbContextOptionsConfigurator = null;
     private IDbProviderInfo? _dbProviderInfo = null;
+    private IDesignTimeServiceLifetime? _designTimeServiceLifetime;
+    private bool _isDisposed;
 
     /// <summary>
     /// Gets the file path to the source file where the <typeparamref name="TDbContext"/> is defined.
@@ -49,6 +52,49 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
 
     /// <inheritdoc />
     bool IDbContextDesignSupport.IsDesignTime { get => IsDesignTime; set => IsDesignTime = value; }
+
+    /// <inheritdoc />
+    void IDbContextDesignTimeLifetimeOwner.SetDesignTimeServiceLifetime(IDesignTimeServiceLifetime lifetime)
+    {
+        ArgumentNullException.ThrowIfNull(lifetime);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        if (Interlocked.CompareExchange(ref _designTimeServiceLifetime, lifetime, null) is not null)
+            throw new InvalidOperationException("A design-time service lifetime is already attached to this context.");
+    }
+
+    /// <inheritdoc />
+    public override void Dispose()
+    {
+        _isDisposed = true;
+        var lifetime = Interlocked.Exchange(ref _designTimeServiceLifetime, null);
+
+        try
+        {
+            base.Dispose();
+        }
+        finally
+        {
+            lifetime?.Dispose();
+        }
+    }
+
+    /// <inheritdoc />
+    public override async ValueTask DisposeAsync()
+    {
+        _isDisposed = true;
+        var lifetime = Interlocked.Exchange(ref _designTimeServiceLifetime, null);
+
+        try
+        {
+            await base.DisposeAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            if (lifetime is not null)
+                await lifetime.DisposeAsync().ConfigureAwait(false);
+        }
+    }
 
     /// <summary>
     /// Creates a new <see cref="BaseDbContext{TDbContext}"/>.

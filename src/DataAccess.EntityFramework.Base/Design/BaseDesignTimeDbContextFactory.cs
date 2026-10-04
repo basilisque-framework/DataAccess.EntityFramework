@@ -29,16 +29,47 @@ namespace Basilisque.DataAccess.EntityFramework.Base.Design;
 public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDbContextFactory<TDbContext>
     where TDbContext : DbContext
 {
-    private static IServiceScope? _scope;
-
     /// <inheritdoc />
+    /// <remarks>
+    /// Each call creates an independent service lifetime owned by the returned context.
+    /// The context must implement <see cref="IDbContextDesignTimeLifetimeOwner"/>.
+    /// </remarks>
     public TDbContext CreateDbContext(string[] args)
     {
         var serviceProvider = createServiceProvider(args);
+        DesignTimeServiceLifetime? lifetime = null;
 
-        _scope ??= serviceProvider.CreateScope();
+        try
+        {
+            lifetime = new DesignTimeServiceLifetime(serviceProvider, serviceProvider.CreateAsyncScope());
+            var context = CreateDbContext(lifetime.ServiceProvider, args);
 
-        return CreateDbContext(_scope.ServiceProvider, args);
+            if (context is not IDbContextDesignTimeLifetimeOwner owner)
+                throw new InvalidOperationException($"The design-time context '{typeof(TDbContext).FullName}' must implement {nameof(IDbContextDesignTimeLifetimeOwner)} to own and dispose its service scope and provider.");
+
+            owner.SetDesignTimeServiceLifetime(lifetime);
+            return context;
+        }
+        catch (Exception creationError)
+        {
+            try
+            {
+                // Failed creation must also release async-only services without capturing the caller's synchronization context.
+                Task.Run(async () =>
+                {
+                    if (lifetime is not null)
+                        await lifetime.DisposeAsync().ConfigureAwait(false);
+                    else
+                        await serviceProvider.DisposeAsync().ConfigureAwait(false);
+                }).GetAwaiter().GetResult();
+            }
+            catch (Exception cleanupError)
+            {
+                throw new AggregateException("Design-time context creation and service cleanup both failed.", creationError, cleanupError);
+            }
+
+            throw;
+        }
     }
 
     /// <summary>
