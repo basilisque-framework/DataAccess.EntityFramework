@@ -80,5 +80,58 @@ public interface IMyInterface
 For details see the __[wiki](https://github.com/basilisque-framework/DataAccess/wiki)__.
 
 -->
+## Entity stamping and dependency injection
+`BaseDbContext<TDbContext>` automatically configures and runs entity stamping.
+Entities implementing the interfaces in `Basilisque.DataAccess.EntityFramework.Base.Stamping`
+can receive creation and modification timestamps and user IDs.
+
+The generated dependency-registration chain registers the scoped stamping interceptor,
+the timestamp handler, and a user-stamp dispatcher with open generic
+`IUserStampHandler<TKey>` / `UserStampHandler<TKey>` registration. It also registers the
+Core user-context services through the library's dependencies; no separate Core
+registration is required.
+
+For example, register the base library and its dependencies with:
+
+```csharp
+Basilisque.DataAccess.EntityFramework.Base.IServiceCollectionExtensions.RegisterServices(services);
+```
+
+Applications normally use their own generated registration entry point, which
+includes the base library through the dependency chain. Calling
+`IDependencyRegistrator.RegisterServices(services)` directly only registers that
+assembly's services, not its dependencies.
+
+Resolve DbContexts from a dependency-injection scope. Set the current user through
+`IWritableUserContext<Guid>` from that same scope before saving changes. When no user
+is available, timestamps are still applied, but user stamp values are not changed.
+The `IDbProviderServiceProvider` wrapper is transient so each context resolves the
+interceptor and user context from its own scope. Singleton connection-string builders
+only use the wrapper's configuration-section metadata.
+
+Core already provides user contexts for other key types through its open generic
+registrations. The dispatcher discovers the user-key types from configured CLR and
+shadow stamp properties in the EF model and resolves their handlers from the current
+scope. No additional handler registration is needed for string, int, or other
+supported user-key types. For example, set the current string user in the context's scope:
+
+```csharp
+using Basilisque.Core.Auth;
+using Microsoft.Extensions.DependencyInjection;
+
+scope.ServiceProvider.GetRequiredService<IWritableUserContext<string>>().UserId = "user-123";
+```
+
+Applications can replace a handler for a specific key type by registering a closed
+`IUserStampHandler<TKey>` implementation.
+Registration of custom user-context implementations, proxies, or convenience
+interfaces is the application's responsibility.
+
+Design-time factories register the interceptor independently and do not require
+application user-context services. No stamp handlers are registered by default at
+design time, so explicitly supplied seed values are not overwritten by stamping.
+The runtime dispatcher dynamically closes generic handler types; Native AOT and
+trimmed deployments require separate compatibility validation.
+
 ## License
 The Basilisque framework (including this repository) is licensed under the [Apache License, Version 2.0](LICENSE.txt).

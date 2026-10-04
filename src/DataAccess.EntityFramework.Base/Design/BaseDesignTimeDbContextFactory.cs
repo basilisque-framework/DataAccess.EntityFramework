@@ -17,6 +17,7 @@
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
+using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -143,8 +144,9 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
     private void configureServices(IServiceCollection services, string[] args)
     {
         services.AddSingleton<IConfiguration>(sp => CreateConfiguration(sp, args));
-        services.AddSingleton<IDbProviderServiceProvider, DbProviderServiceProvider>();
+        services.AddTransient<IDbProviderServiceProvider, DbProviderServiceProvider>();
         services.AddSingleton<IConnectionStringBuilder, ConnectionStringBuilder>();
+        services.AddScoped<CompositeStampInterceptor>();
 
         services.AddTransient<TDbContext>();
     }

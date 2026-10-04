@@ -1,5 +1,5 @@
-﻿<!--
-   Copyright 2025 Alexander Stärk
+/*
+   Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -12,9 +12,19 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
--->
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
-  </ItemGroup>
-</Project>
+*/
+
+namespace Basilisque.DataAccess.EntityFramework.Base.Stamping;
+
+/// <summary>
+/// Defines an entity that stores its creation timestamp and creator key.
+/// </summary>
+/// <typeparam name="TUserKey">The type of the user key.</typeparam>
+public interface IStampCreation<TUserKey> : IStampCreateDate, IStampCreateUser<TUserKey>
+{ }
+
+/// <summary>
+/// Defines an entity that stores its creation timestamp and Guid creator key.
+/// </summary>
+public interface IStampCreation : IStampCreation<Guid>
+{ }

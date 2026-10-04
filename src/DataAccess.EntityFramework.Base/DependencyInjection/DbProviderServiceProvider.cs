@@ -21,7 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 
 /// <inheritdoc />
-[RegisterServiceSingleton]
+[RegisterServiceTransient]
 public class DbProviderServiceProvider : IDbProviderServiceProvider
 {
     private const string DatabaseProviderConfigurationKey = "Provider";

@@ -17,6 +17,7 @@
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -113,6 +114,9 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
         _dbContextOptionsConfigurator ??= _dbProviderServiceProvider.GetRequiredService<IDbContextOptionsConfigurator>();
 
         _dbContextOptionsConfigurator.Configure(this, optionsBuilder);
+
+        var compositeStampInterceptor = _dbProviderServiceProvider.GetRequiredService<CompositeStampInterceptor>();
+        optionsBuilder.UseEFCoreStamping(compositeStampInterceptor);
     }
 
     /// <inheritdoc />
@@ -130,6 +134,8 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
         base.OnModelCreating(modelBuilder);
 
         ConfigureVersion7GuidKeyGeneration(modelBuilder);
+
+        modelBuilder.ApplyStampConfigurations();
     }
 
     /// <summary>

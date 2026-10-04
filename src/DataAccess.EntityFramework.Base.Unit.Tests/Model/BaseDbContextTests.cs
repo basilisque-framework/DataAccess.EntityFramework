@@ -17,6 +17,7 @@
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 
 namespace Basilisque.DataAccess.EntityFramework.Base.Unit.Tests.Model;
@@ -82,6 +83,7 @@ public class BaseDbContextTests
         sp.DatabaseConfigurationSectionName.Returns("Database");
         sp.GetRequiredService<IDbProviderInfo>().Returns(providerInfo);
         sp.GetRequiredService<IDbContextOptionsConfigurator>().Returns(configurator);
+        sp.GetRequiredService<CompositeStampInterceptor>().Returns(new CompositeStampInterceptor([]));
 
         var ctx = new TestDbContext(sp);
 
