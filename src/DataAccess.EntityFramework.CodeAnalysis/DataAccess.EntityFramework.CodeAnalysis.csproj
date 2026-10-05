@@ -20,6 +20,8 @@
     <LangVersion>latest</LangVersion>
     <BAS_CB_Set_LangVersion>false</BAS_CB_Set_LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- ExtensionSupport already bundles the CodeAnalysis helper assembly. -->
+    <BAS_CA_Dependency_PackCS>false</BAS_CA_Dependency_PackCS>
   </PropertyGroup>
   
   <ItemGroup>
