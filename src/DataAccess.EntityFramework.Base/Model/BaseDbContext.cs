@@ -44,6 +44,11 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
     protected internal string DbContextSourceFilePath { get; }
 
     /// <summary>
+    /// Gets the <see cref="IDbProviderServiceProvider"/> that is used to resolve database provider specific services.
+    /// </summary>
+    protected IDbProviderServiceProvider DbProviderServiceProvider => _dbProviderServiceProvider;
+
+    /// <summary>
     /// Indicates whether the current database context instance is being used in a design-time environment.
     /// </summary>
     public bool IsDesignTime { get; private set; }

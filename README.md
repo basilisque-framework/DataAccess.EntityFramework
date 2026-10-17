@@ -312,5 +312,164 @@ in the asynchronous path. Detaching first prevents recursive disposal because th
 service scope also tracks the context. Contexts without this contract are rejected
 with an explicit exception; failed creation releases the newly created services.
 
+## Hard-delete audit and temporal tables
+
+Temporal history retains row versions, but a physical DELETE does not update the
+last row's modification actor. Hard-delete auditing records that separate event in
+an ordinary, non-temporal table. It does not modify or link to SQL Server period
+columns. Application timestamps and temporal transaction timestamps need not match.
+
+### Opt-in and configuration
+
+Use the interfaces and builders from
+`Basilisque.DataAccess.EntityFramework.Relational.HardDelete`.
+No per-entity audit class is required:
+
+```csharp
+public class Document : IHardDeleteAudited
+{
+    public Guid Id { get; set; }
+}
+```
+
+`IHardDeleteAudited` uses a nullable Guid actor. `IHardDeleteAudited<TUser>` selects
+another non-nullable actor key type; the stored actor is always nullable.
+The entity's primary key is inferred independently from the actor type.
+Alternatively, enable auditing with the Fluent API, which also overrides interface
+defaults:
+
+```csharp
+modelBuilder.Entity<Document>().UseHardDeleteAudit(audit => audit
+    .ToTable("DocumentDeletions", "audit")
+    .HasUserKey<Guid>());
+```
+
+With the SQL Server extensions in
+`Basilisque.DataAccess.EntityFramework.SqlServer.HardDelete`, configure both features
+in one table callback:
+
+```csharp
+modelBuilder.Entity<Document>().ToTable("Documents", table =>
+{
+    table.IsTemporalWithHardDeleteAudit(
+        temporal => temporal.UseHistoryTable("DocumentsHistory"),
+        audit => audit.ToTable("DocumentDeletions", "audit"));
+});
+```
+
+`table.UseHardDeleteAudit(...)` can also accompany the standard `table.IsTemporal(...)`.
+EF's temporal builder does not publicly expose the source entity builder, so these
+entry points live on the table builder, without accessing private EF fields.
+The audit feature itself does not require temporal tables.
+
+Relational `BaseDbContext<TDbContext>` automatically installs the model convention
+and ordered interceptors. Its generated dependency-registration chain supplies actor
+providers for Guid, string, int, and long using the same Core user contexts as
+stamping. Applications using ordinary DbContexts should register the Relational
+library's generated services, call `optionsBuilder.UseHardDeleteAudit(scopedServices)`
+(which already includes `UseEFCoreStamping`), and install
+`configurationBuilder.AddHardDeleteAuditConvention()` in `ConfigureConventions`.
+Alternatively, call `modelBuilder.ApplyHardDeleteAuditConfigurations()` at the end
+of `OnModelCreating`.
+
+For custom actor types register a scoped `IHardDeleteAuditUserProvider`, for example
+`HardDeleteAuditUserProvider<MyUserKey>`, and configure an EF conversion if needed.
+Missing providers fail explicitly when an audited deletion is attempted.
+Design-time contexts can build the audit model without actor providers; executing
+audited hard deletes still requires those providers.
+The SQLite, PostgreSQL, and SQL Server design-time factories inherit from
+`Relational.Design.RelationalBaseDesignTimeDbContextFactory<TDbContext>`, which
+registers the scoped audit interceptor. Each provider calls the relational
+`ConfigureProviderServices` implementation, including when composed as child factories.
+Custom relational factories should inherit from this intermediate base class and
+call `base.ConfigureProviderServices(...)` if they override that method.
+Factories deriving directly from the non-relational Base design-time factory must register
+`HardDeleteAuditInterceptor` in `ConfigureServices` themselves. Runtime contexts
+require its normal DI registration and fail during configuration if it is missing;
+the context never constructs a replacement interceptor.
+
+The late convention uses the final entity table name and schema; by default the
+audit table is `<TableName>DeleteAudit` in the same schema. Add a normal EF migration
+to create it. Each event contains `AuditId`, the entity key, `DeletedAt`, and nullable
+`DeletedBy`, with no foreign key to the deleted row or actor.
+
+### Querying events and composite keys
+
+Simple keys use a shared generic CLR type with a separate EF entity name and table
+for each audited entity:
+
+```csharp
+var events = await context.HardDeleteAudits<Document, Guid>()
+    .Where(audit => audit.EntityKey == documentId)
+    .ToListAsync();
+```
+
+For non-Guid actors use `HardDeleteAudits<TEntity, TKey, TNullableUser>()`, for
+example `HardDeleteAudits<Document, Guid, int?>()`.
+
+Composite primary keys work without a key class. Their dynamic columns are named
+`EntityKey_` followed by the source property name:
+
+```csharp
+var events = await context.HardDeleteAudits<TenantDocument>()
+    .Where(audit =>
+        EF.Property<Guid>(audit, "EntityKey_TenantId") == tenantId &&
+        EF.Property<int>(audit, "EntityKey_Number") == documentNumber)
+    .ToListAsync();
+```
+
+For typed composite queries, provide a key value object with a public parameterless
+constructor and public writable properties. Map every primary-key component once:
+
+```csharp
+public class DocumentKey
+{
+    public Guid TenantId { get; set; }
+    public int Number { get; set; }
+}
+
+modelBuilder.Entity<TenantDocument>().UseHardDeleteAudit(audit =>
+    audit.HasEntityKey<DocumentKey>(key =>
+    {
+        key.Property(value => value.TenantId, document => document.TenantId);
+        key.Property(value => value.Number, document => document.Number);
+    }));
+
+var events = await context.HardDeleteAudits<TenantDocument, DocumentKey>()
+    .Where(audit => audit.EntityKey.TenantId == tenantId &&
+                    audit.EntityKey.Number == documentNumber)
+    .ToListAsync();
+```
+
+The key object is mapped as a required complex property, not an owned entity.
+Key converters, comparison, length, precision and Unicode settings are copied from
+the source key properties. Both typed and dynamic queries run in the database.
+
+### Transaction and scope guarantees
+
+Auditing runs after soft-delete conversion and stamping. Soft deletes and restores
+create no physical deletion events; `SoftDeleteSuppressor.AllowHardDelete()` does.
+No current actor results in SQL NULL. Stamp suppression preserves the event and
+timestamp but omits its actor.
+
+Audit inserts and DELETE statements execute in one `SaveChanges` transaction.
+Failures and cancellations discard generated tracked audit entries so a retry
+does not duplicate them. Existing EF transactions require automatic savepoints;
+ambient/enlisted transactions and disabled automatic transactions are rejected.
+After an external transaction rollback, reload/clear the context as with ordinary
+EF writes. The `SaveChanges` affected-entry count includes audit inserts.
+
+Only tracked physical deletions are covered. Bulk APIs, raw SQL, database-side
+cascades, and external writers bypass this feature. Immediate tracked cascades are
+captured; deferred `OnSaveChanges` cascade/orphan timing is rejected for audited
+models. Never-saved entities removed from the tracker create no event.
+
+Owned entities, inheritance, shared source CLR types, table sharing, entity splitting,
+and keyless entities are rejected rather than incompletely audited. Generated audit
+entities cannot be manually inserted, changed or deleted through the ChangeTracker;
+this is not a database security boundary or a tamper-proof audit log.
+The feature uses runtime generic construction and reflection for inferred audit
+types; Native AOT, trimming, and compiled models are not currently guaranteed.
+
 ## License
 The Basilisque framework (including this repository) is licensed under the [Apache License, Version 2.0](LICENSE.txt).

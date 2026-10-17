@@ -15,6 +15,7 @@
 */
 
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
+using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -26,6 +27,8 @@ namespace Basilisque.DataAccess.EntityFramework.Relational.Model;
 public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFramework.Base.Model.BaseDbContext<TDbContext>
     where TDbContext : BaseDbContext<TDbContext>
 {
+    private readonly IDbProviderServiceProvider _dbProviderServiceProvider;
+
     /// <summary>
     /// Creates a new <see cref="BaseDbContext{TDbContext}"/>.
     /// </summary>
@@ -36,7 +39,28 @@ public abstract class BaseDbContext<TDbContext> : Basilisque.DataAccess.EntityFr
         [CallerFilePath] string dbContextSourceFilePath = ""
         )
         : base(dbProviderServiceProvider, dbContextSourceFilePath)
-    { }
+    {
+        _dbProviderServiceProvider = dbProviderServiceProvider;
+    }
+
+    /// <inheritdoc />
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        var dbProviderServiceProvider = DbProviderServiceProvider;
+
+        var interceptor = dbProviderServiceProvider.GetRequiredService<HardDeleteAuditInterceptor>();
+
+        optionsBuilder.AddInterceptors(interceptor);
+    }
+
+    /// <inheritdoc />
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.AddHardDeleteAuditConvention();
+    }
 
     /// <summary>
     /// Gets the app area prefix for the table names.

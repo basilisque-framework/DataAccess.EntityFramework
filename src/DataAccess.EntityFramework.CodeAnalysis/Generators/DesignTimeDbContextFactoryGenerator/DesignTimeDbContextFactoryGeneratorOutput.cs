@@ -53,7 +53,7 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         if (baseDesignTimeFactoryFQNames.Length < 1 || dbContexts.Length < 1)
             return;
 
-        if (data.Input.GeneratorInfo.DesignTimeFactories.Length > 1)
+        if (baseDesignTimeFactoryFQNames.Length > 1)
             outputMultipleProviders(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
         else
             outputSingleProvider(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);

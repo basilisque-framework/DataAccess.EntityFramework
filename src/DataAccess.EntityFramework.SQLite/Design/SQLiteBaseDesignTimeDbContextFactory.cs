@@ -15,9 +15,9 @@
 */
 
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
-using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Basilisque.DataAccess.EntityFramework.SQLite.Connection;
 using Basilisque.DataAccess.EntityFramework.SQLite.Model;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +36,13 @@ namespace Basilisque.DataAccess.EntityFramework.SQLite.Design;
 ///     for more information and examples.
 /// </remarks>
 /// <typeparam name="TDbContext">The type of the context.</typeparam>
-public class SQLiteBaseDesignTimeDbContextFactory<TDbContext> : BaseDesignTimeDbContextFactory<TDbContext>
+public class SQLiteBaseDesignTimeDbContextFactory<TDbContext> : RelationalBaseDesignTimeDbContextFactory<TDbContext>
     where TDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     /// <inheritdoc />
     public sealed override void ConfigureProviderServices(IServiceCollection services, string[] args, bool isChildFactory)
     {
+        base.ConfigureProviderServices(services, args, isChildFactory);
         services.AddKeyedSingleton<IDbProviderInfo, SQLiteDbProviderInfo>(SQLiteDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IDbContextOptionsConfigurator, SQLiteDbContextOptionsConfigurator>(SQLiteDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IConnectionStringBuilder, SQLiteConnectionStringBuilder>(SQLiteDbProviderInfo.ProviderKeyName);

@@ -24,11 +24,17 @@ internal static class StampPropertyExtensions
 
     public static StampPropertyKind? GetStampPropertyKind(this IReadOnlyProperty property)
     {
-        return property.FindAnnotation(PropertyKindAnnotationName)?.Value as StampPropertyKind?;
+        return property.FindAnnotation(PropertyKindAnnotationName)?.Value switch
+        {
+            int value => (StampPropertyKind)value,
+            StampPropertyKind value => value,
+            _ => null
+        };
     }
 
     public static void SetStampPropertyKind(this IMutableProperty property, StampPropertyKind propertyKind)
     {
-        property.SetAnnotation(PropertyKindAnnotationName, propertyKind);
+        // Migration snapshots cannot reference the internal enum from application assemblies.
+        property.SetAnnotation(PropertyKindAnnotationName, (int)propertyKind);
     }
 }

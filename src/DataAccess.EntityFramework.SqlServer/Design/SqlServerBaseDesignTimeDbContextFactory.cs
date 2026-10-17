@@ -15,9 +15,9 @@
 */
 
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
-using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Basilisque.DataAccess.EntityFramework.SqlServer.Connection;
 using Basilisque.DataAccess.EntityFramework.SqlServer.Model;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +36,13 @@ namespace Basilisque.DataAccess.EntityFramework.SqlServer.Design;
 ///     for more information and examples.
 /// </remarks>
 /// <typeparam name="TDbContext">The type of the context.</typeparam>
-public class SqlServerBaseDesignTimeDbContextFactory<TDbContext> : BaseDesignTimeDbContextFactory<TDbContext>
+public class SqlServerBaseDesignTimeDbContextFactory<TDbContext> : RelationalBaseDesignTimeDbContextFactory<TDbContext>
     where TDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     /// <inheritdoc />
     public sealed override void ConfigureProviderServices(IServiceCollection services, string[] args, bool isChildFactory)
     {
+        base.ConfigureProviderServices(services, args, isChildFactory);
         services.AddKeyedSingleton<IDbProviderInfo, SqlServerDbProviderInfo>(SqlServerDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IDbContextOptionsConfigurator, SqlServerDbContextOptionsConfigurator>(SqlServerDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IConnectionStringBuilder, SqlServerConnectionStringBuilder>(SqlServerDbProviderInfo.ProviderKeyName);

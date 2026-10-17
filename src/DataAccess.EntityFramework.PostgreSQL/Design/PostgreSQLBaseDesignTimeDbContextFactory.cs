@@ -15,9 +15,9 @@
 */
 
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
-using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
+using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Basilisque.DataAccess.EntityFramework.PostgreSQL.Connection;
 using Basilisque.DataAccess.EntityFramework.PostgreSQL.Model;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +36,13 @@ namespace Basilisque.DataAccess.EntityFramework.PostgreSQL.Design;
 ///     for more information and examples.
 /// </remarks>
 /// <typeparam name="TDbContext">The type of the context.</typeparam>
-public class PostgreSQLBaseDesignTimeDbContextFactory<TDbContext> : BaseDesignTimeDbContextFactory<TDbContext>
+public class PostgreSQLBaseDesignTimeDbContextFactory<TDbContext> : RelationalBaseDesignTimeDbContextFactory<TDbContext>
     where TDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     /// <inheritdoc />
     public sealed override void ConfigureProviderServices(IServiceCollection services, string[] args, bool isChildFactory)
     {
+        base.ConfigureProviderServices(services, args, isChildFactory);
         services.AddKeyedSingleton<IDbProviderInfo, PostgreSQLDbProviderInfo>(PostgreSQLDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IDbContextOptionsConfigurator, PostgreSQLDbContextOptionsConfigurator>(PostgreSQLDbProviderInfo.ProviderKeyName);
         services.AddKeyedSingleton<IConnectionStringBuilder, PostgreSQLConnectionStringBuilder>(PostgreSQLDbProviderInfo.ProviderKeyName);
