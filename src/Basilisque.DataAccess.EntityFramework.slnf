@@ -1,0 +1,19 @@
+{
+  "solution": {
+    "path": "..\\Basilisque.DataAccess.EntityFramework.slnx",
+    "projects": [
+      "src\\DataAccess.EntityFramework.Base\\DataAccess.EntityFramework.Base.csproj",
+      "src\\DataAccess.EntityFramework.Base.Unit.Tests\\DataAccess.EntityFramework.Base.Unit.Tests.csproj",
+      "src\\DataAccess.EntityFramework.Relational\\DataAccess.EntityFramework.Relational.csproj",
+      "src\\DataAccess.EntityFramework.Relational.Unit.Tests\\DataAccess.EntityFramework.Relational.Unit.Tests.csproj",
+      "src\\DataAccess.EntityFramework.CodeAnalysis\\DataAccess.EntityFramework.CodeAnalysis.csproj",
+      "src\\DataAccess.EntityFramework.CodeAnalysis.Unit.Tests\\DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.csproj",
+      "src\\DataAccess.EntityFramework.SqlServer\\DataAccess.EntityFramework.SqlServer.csproj",
+      "src\\DataAccess.EntityFramework.SqlServer.Unit.Tests\\DataAccess.EntityFramework.SqlServer.Unit.Tests.csproj",
+      "src\\DataAccess.EntityFramework.PostgreSQL\\DataAccess.EntityFramework.PostgreSQL.csproj",
+      "src\\DataAccess.EntityFramework.PostgreSQL.Unit.Tests\\DataAccess.EntityFramework.PostgreSQL.Unit.Tests.csproj",
+      "src\\DataAccess.EntityFramework.SQLite\\DataAccess.EntityFramework.SQLite.csproj",
+      "src\\DataAccess.EntityFramework.SQLite.Unit.Tests\\DataAccess.EntityFramework.SQLite.Unit.Tests.csproj"
+    ]
+  }
+}

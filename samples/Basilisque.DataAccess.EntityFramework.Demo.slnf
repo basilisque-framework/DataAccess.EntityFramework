@@ -1,0 +1,19 @@
+{
+  "solution": {
+    "path": "..\\Basilisque.DataAccess.EntityFramework.slnx",
+    "projects": [
+      "src\\DataAccess.EntityFramework.Base\\DataAccess.EntityFramework.Base.csproj",
+      "src\\DataAccess.EntityFramework.Relational\\DataAccess.EntityFramework.Relational.csproj",
+      "src\\DataAccess.EntityFramework.CodeAnalysis\\DataAccess.EntityFramework.CodeAnalysis.csproj",
+      "src\\DataAccess.EntityFramework.SqlServer\\DataAccess.EntityFramework.SqlServer.csproj",
+      "src\\DataAccess.EntityFramework.PostgreSQL\\DataAccess.EntityFramework.PostgreSQL.csproj",
+      "src\\DataAccess.EntityFramework.SQLite\\DataAccess.EntityFramework.SQLite.csproj",
+      "samples\\Demo.Data\\Demo.Data.csproj",
+      "samples\\Demo.PostgreSQL\\Demo.PostgreSQL.csproj",
+      "samples\\Demo.SQLite\\Demo.SQLite.csproj",
+      "samples\\Demo.SqlServer\\Demo.SqlServer.csproj",
+      "samples\\Demo.Tests\\Demo.Tests.csproj",
+      "samples\\Demo.Web\\Demo.Web.csproj"
+    ]
+  }
+}

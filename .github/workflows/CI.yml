@@ -34,9 +34,10 @@ jobs:
     uses: basilisque-framework/CommonBuild-GitHubActions/.github/workflows/Common-Build.yml@v1.0
     with:
       basBuildType: 'CI'
-      projectOrSolution: 'src/Basilisque.DataAccess.EntityFramework.slnx'
+      projectOrSolution: 'Basilisque.DataAccess.EntityFramework.slnx'
       sonarProjectKey: 'basilisque-framework_DataAccess.EntityFramework'
       sonarOrganization: 'basilisque-framework'
       publishTargetFramework: 'net8.0'
+      runDotnetPublish: false
       runDotnetPack: true
     secrets: inherit

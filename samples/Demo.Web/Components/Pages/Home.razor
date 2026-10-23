@@ -1,0 +1,249 @@
+@page "/"
+@using System.Data.Common
+@using Microsoft.EntityFrameworkCore
+@inject DemoSession Session
+@inject IConfiguration Configuration
+@inject ILogger<Home> Logger
+
+<PageTitle>Basilisque EF Demo</PageTitle>
+
+<main>
+    <header>
+        <p class="eyebrow">Basilisque / Entity Framework</p>
+        <h1>Feature laboratory</h1>
+        <p>A small application template with real database operations and visible audit values.</p>
+        <nav aria-label="Feature sections">
+            <a href="#stamping">Stamping</a>
+            <a href="#soft-delete">Soft delete</a>
+            <a href="#hard-delete">Hard-delete audit</a>
+        </nav>
+        <div class="notice">
+            Local development only. Use a dedicated demo database, never a production database.
+            The demo user selector is not authentication.
+        </div>
+    </header>
+
+    <section>
+        <h2>Environment</h2>
+        <p><strong>Provider:</strong> @Configuration["Database:Provider"] (selected at startup)</p>
+        <label for="user">Demo user for the next operation</label>
+        <select id="user" @bind="_user" disabled="@_busy">
+            <option value="Alice">Alice</option>
+            <option value="Bob">Bob</option>
+            <option value="None">No user</option>
+        </select>
+        <p class="hint">Each operation uses a fresh DI scope, DbContext and scoped user context.</p>
+    </section>
+
+    @if (_error is not null)
+    {
+        <div class="error" role="alert">@_error</div>
+    }
+    <p role="status">@(_busy ? "Working..." : _status)</p>
+
+    <section id="stamping">
+        <h2>1. Create and modify <span class="badge">Base / Stamping</span></h2>
+        <p><code>IStampChanges</code> supplies creation and modification stamps.
+            Switch from Alice to Bob before editing to compare actors. With no current user,
+            existing user stamps are preserved, while timestamps still update.</p>
+        <fieldset disabled="@_busy">
+            <legend>Document editor</legend>
+            <label for="title">Title (required, max. 200 characters)</label>
+            <input id="title" maxlength="200" @bind="_title" />
+            <label for="content">Content (max. 4000 characters)</label>
+            <textarea id="content" maxlength="4000" @bind="_content"></textarea>
+            <div class="actions">
+                <button @onclick="createAsync">Create new document</button>
+                <button @onclick="() => executeAsync(DocumentAction.Update)"
+                        disabled="@(_selected is null || _selected.DeletedAt is not null)">Save selected document</button>
+            </div>
+        </fieldset>
+        <p class="hint">Entry point: <code>Demo.Data/DocumentScenarios.cs</code> &rarr;
+            <code>CreateAsync</code> / <code>ExecuteAsync</code>. Entity: <code>Document.cs</code>.</p>
+    </section>
+
+    <section id="soft-delete">
+        <h2>2. Delete and restore <span class="badge">Base / Soft Delete</span></h2>
+        <p><code>Remove + SaveChangesAsync</code> sets deletion values instead of deleting the row.
+            The named soft-delete filter hides it. Restore clears <code>DeletedAt</code>;
+            the library clears <code>DeletedBy</code> automatically.</p>
+        <fieldset disabled="@_busy">
+            <legend>Query and actions</legend>
+            <label for="view">Document view</label>
+            <select id="view" @bind="_view" @bind:after="refreshAsync">
+                <option value="@DocumentView.Active">Active</option>
+                <option value="@DocumentView.Deleted">Deleted</option>
+                <option value="@DocumentView.All">All</option>
+            </select>
+            <div class="actions">
+                <button @onclick="refreshAsync">Refresh from database</button>
+                <button @onclick="() => executeAsync(DocumentAction.SoftDelete)"
+                        disabled="@(_selected is null || _selected.DeletedAt is not null)">Soft delete selected</button>
+                <button @onclick="() => executeAsync(DocumentAction.Restore)"
+                        disabled="@(_selected?.DeletedAt is null)">Restore selected</button>
+            </div>
+        </fieldset>
+        <div class="table-scroll">
+            <table>
+                <thead><tr><th>Select</th><th>Title</th><th>Created at (UTC)</th><th>Created by</th><th>Modified at (UTC)</th><th>Modified by</th><th>Deleted at (UTC)</th><th>Deleted by</th></tr></thead>
+                <tbody>
+                    @foreach (var document in _snapshot.Documents)
+                    {
+                        <tr @key="document.Id" class="@(_selected?.Id == document.Id ? "selected" : "")">
+                            <td><button disabled="@_busy" @onclick="() => select(document)">Select</button></td>
+                            <td>@document.Title</td>
+                            <td>@document.CreatedAt.ToUniversalTime().ToString("u")</td>
+                            <td>@DemoUsers.Display(document.CreatedBy)</td>
+                            <td>@document.ModifiedAt.ToUniversalTime().ToString("u")</td>
+                            <td>@DemoUsers.Display(document.ModifiedBy)</td>
+                            <td>@document.DeletedAt?.ToUniversalTime().ToString("u")</td>
+                            <td>@DemoUsers.Display(document.DeletedBy)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (_snapshot.Documents.Count == 0)
+        {
+            <p>No documents in this view.</p>
+        }
+        <p class="hint">Only <code>Basilisque:SoftDelete</code> is disabled for the Deleted/All views.
+            Query filters do not form an authorization boundary. Soft deletion does not cascade to related entities.</p>
+    </section>
+
+    <section id="hard-delete">
+        <h2>3. Physical deletion <span class="badge">Relational / Hard-Delete-Audit</span></h2>
+        <p><code>SoftDeleteSuppressor.AllowHardDelete()</code> allows a physical deletion.
+            <code>IHardDeleteAudited</code> retains the key, deletion time and actor in a separate audit table.
+            Soft deletion alone does not create a hard-delete event.</p>
+        <fieldset disabled="@_busy">
+            <legend>Permanent deletion</legend>
+            <label class="check"><input type="checkbox" @bind="_confirmHardDelete" />
+                I want to permanently delete the selected document.</label>
+            <button class="danger" disabled="@(_selected is null || !_confirmHardDelete)"
+                    @onclick="() => executeAsync(DocumentAction.HardDelete)">Permanently delete selected</button>
+        </fieldset>
+        <div class="table-scroll">
+            <table>
+                <thead><tr><th>Deleted document key</th><th>Deleted at (UTC)</th><th>Deleted by</th></tr></thead>
+                <tbody>
+                    @foreach (var audit in _snapshot.Deletions)
+                    {
+                        <tr @key="audit.AuditId">
+                            <td>@audit.EntityKey</td>
+                            <td>@audit.DeletedAt.ToUniversalTime().ToString("u")</td>
+                            <td>@DemoUsers.Display(audit.DeletedBy)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="hint">Works with all three providers. SQL Server temporal tables are a separate feature
+            and are not enabled in this first demo.</p>
+    </section>
+
+    <section>
+        <h2>Last successful operation</h2>
+        @if (_last is not null)
+        {
+            <p><code>@_last.Operation</code></p>
+            <div class="comparison">
+                <div><h3>Before</h3><DocumentDetails Document="_last.Before" /></div>
+                <div><h3>After</h3><DocumentDetails Document="_last.After" /></div>
+            </div>
+        }
+        else
+        {
+            <p>Create a document or select a row and perform an action to compare values.</p>
+        }
+        <p class="hint">EF SQL commands appear in the application console. Sensitive-data logging is not enabled.</p>
+    </section>
+
+    <section>
+        <h2>Reset demo data</h2>
+        <p>Deletes all documents and deletion audit events in the two demo tables, in a transaction.
+            This maintenance action deliberately bypasses per-row auditing; it does not drop the database.</p>
+        <fieldset disabled="@_busy">
+            <legend>Reset confirmation</legend>
+            <label class="check"><input type="checkbox" @bind="_confirmReset" /> I want to clear all demo data and audit events.</label>
+            <button class="danger" disabled="@(!_confirmReset)" @onclick="resetAsync">Clear demo data</button>
+        </fieldset>
+    </section>
+</main>
+
+@code {
+    private DemoSnapshot _snapshot = new([], []);
+    private DocumentSnapshot? _selected;
+    private ActionResult? _last;
+    private DocumentView _view;
+    private string _user = "Alice";
+    private string _title = "";
+    private string _content = "";
+    private string? _error;
+    private string _status = "";
+    private bool _busy;
+    private bool _confirmHardDelete;
+    private bool _confirmReset;
+
+    private Guid? userId => _user switch { "Alice" => DemoUsers.Alice, "Bob" => DemoUsers.Bob, _ => null };
+
+    protected override Task OnInitializedAsync() => refreshAsync();
+
+    private void select(DocumentSnapshot document)
+    {
+        _selected = document;
+        _title = document.Title;
+        _content = document.Content;
+        _confirmHardDelete = false;
+    }
+
+    private Task refreshAsync() => runUiAsync(() => Task.CompletedTask);
+
+    private Task createAsync() => runUiAsync(async () =>
+    {
+        _last = await Session.RunAsync(userId, scenarios => scenarios.CreateAsync(_title, _content));
+        _selected = _last.After;
+    });
+
+    private Task executeAsync(DocumentAction action) => runUiAsync(async () =>
+    {
+        if (_selected is null)
+            throw new InvalidOperationException("Select a document first.");
+        _last = await Session.RunAsync(userId, scenarios => scenarios.ExecuteAsync(_selected.Id, action, _title, _content));
+        _selected = _last.After;
+        _confirmHardDelete = false;
+    });
+
+    private Task resetAsync() => runUiAsync(async () =>
+    {
+        await Session.RunAsync(userId, scenarios => scenarios.ResetAsync());
+        _selected = null;
+        _last = null;
+        _confirmReset = false;
+    });
+
+    private async Task runUiAsync(Func<Task> action)
+    {
+        if (_busy)
+            return;
+        _busy = true;
+        _error = null;
+        _status = "";
+        try
+        {
+            await action();
+            _snapshot = await Session.RunAsync(userId, scenarios => scenarios.ReadAsync(_view));
+            _selected = _snapshot.Documents.SingleOrDefault(document => document.Id == _selected?.Id);
+            _status = $"Loaded {_snapshot.Documents.Count} document(s) and {_snapshot.Deletions.Count} deletion event(s).";
+        }
+        catch (Exception exception) when (exception is DbUpdateException or DbException or InvalidOperationException or ArgumentException)
+        {
+            Logger.LogError(exception, "Demo operation failed for provider {Provider}", Configuration["Database:Provider"]);
+            _error = exception is ArgumentException ? exception.Message : "The operation failed. Check the application console for details, then refresh.";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\src\DataAccess.EntityFramework.PostgreSQL\build\Basilisque.DataAccess.EntityFramework.PostgreSQL.props" />
+  <PropertyGroup>
+    <BAS_DA_EF_IsMigrationAssembly>true</BAS_DA_EF_IsMigrationAssembly>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Demo.Data\Demo.Data.csproj" />
+    <ProjectReference Include="..\..\src\DataAccess.EntityFramework.PostgreSQL\DataAccess.EntityFramework.PostgreSQL.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

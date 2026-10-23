@@ -1,0 +1,24 @@
+@if (Document is null)
+{
+    <p>No row.</p>
+}
+else
+{
+    <dl>
+        <dt>Id</dt><dd>@Document.Id</dd>
+        <dt>Title</dt><dd>@Document.Title</dd>
+        <dt>Content</dt><dd>@Document.Content</dd>
+        <dt>CreatedAt</dt><dd>@time(Document.CreatedAt)</dd>
+        <dt>CreatedBy</dt><dd>@DemoUsers.Display(Document.CreatedBy)</dd>
+        <dt>ModifiedAt</dt><dd>@time(Document.ModifiedAt)</dd>
+        <dt>ModifiedBy</dt><dd>@DemoUsers.Display(Document.ModifiedBy)</dd>
+        <dt>DeletedAt</dt><dd>@(Document.DeletedAt is { } deleted ? time(deleted) : "-")</dd>
+        <dt>DeletedBy</dt><dd>@DemoUsers.Display(Document.DeletedBy)</dd>
+    </dl>
+}
+
+@code {
+    [Parameter] public DocumentSnapshot? Document { get; set; }
+
+    private static string time(DateTimeOffset value) => value.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fffffff 'UTC'");
+}

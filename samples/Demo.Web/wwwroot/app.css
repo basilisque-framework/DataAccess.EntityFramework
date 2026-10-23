@@ -1,0 +1,39 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #203047; background: #f3f5f8; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1180px; margin: auto; padding: 2rem 1rem 4rem; }
+h1 { font-size: 2.5rem; margin: .5rem 0; }
+h2 { margin-top: 0; }
+p { line-height: 1.6; }
+header { margin-bottom: 2rem; }
+nav { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+a { color: #1d4e89; }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; color: #405877; }
+section { background: white; padding: 1.5rem; margin: 1rem 0; border: 1px solid #d9e0e8; border-radius: .75rem; }
+.notice, .error { padding: 1rem; border-radius: .4rem; background: #fff0ce; }
+.error { background: #ffe1e1; border: 1px solid #b42c2c; }
+.badge { display: inline-block; font-size: .75rem; background: #e4ecf9; padding: .3rem .6rem; border-radius: 1rem; vertical-align: middle; }
+.hint { font-size: .9rem; color: #475970; }
+fieldset { border: 1px solid #d9e0e8; padding: 1rem; }
+label { display: block; margin: .75rem 0 .3rem; }
+input, textarea, select, button { font: inherit; padding: .6rem; border-radius: .3rem; border: 1px solid #a8b5c5; }
+input:not([type=checkbox]), textarea { width: 100%; }
+textarea { min-height: 6rem; resize: vertical; }
+button { cursor: pointer; background: #1d4e89; color: white; border-color: #1d4e89; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+button.danger { background: #a52a2a; border-color: #a52a2a; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #ed9b25; outline-offset: 2px; }
+.actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+.check { margin-bottom: 1rem; }
+.table-scroll { overflow-x: auto; margin-top: 1rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; text-align: left; }
+th, td { padding: .7rem; border-bottom: 1px solid #d9e0e8; }
+th { background: #f0f4f9; }
+tr.selected { background: #e4ecf9; }
+.comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+dl { font-size: .9rem; overflow-wrap: anywhere; }
+dt { font-weight: 600; margin-top: .7rem; }
+dd { margin: .25rem 0; white-space: pre-wrap; }
+code { overflow-wrap: anywhere; }
+#blazor-error-ui { display: none; position: fixed; bottom: 0; width: 100%; padding: 1rem; background: #ffe1e1; }
+@media (max-width: 700px) { .comparison { grid-template-columns: 1fr; } h1 { font-size: 2rem; } section { padding: 1rem; } }

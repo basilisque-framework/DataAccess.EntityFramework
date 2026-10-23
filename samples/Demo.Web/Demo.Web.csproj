@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <UserSecretsId>Basilisque.EntityFramework.Demo</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Demo.SQLite\Demo.SQLite.csproj" />
+    <ProjectReference Include="..\Demo.SqlServer\Demo.SqlServer.csproj" />
+    <ProjectReference Include="..\Demo.PostgreSQL\Demo.PostgreSQL.csproj" />
+    <Content Include="..\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

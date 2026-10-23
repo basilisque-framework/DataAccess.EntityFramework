@@ -80,6 +80,33 @@ public interface IMyInterface
 For details see the __[wiki](https://github.com/basilisque-framework/DataAccess/wiki)__.
 
 -->
+## Interactive demo
+
+The [sample application](samples/README.md) is a small Blazor Interactive Server
+feature laboratory and application template for SQLite, SQL Server and PostgreSQL.
+It demonstrates Basilisque dependency registration, migrations, scoped user
+stamping, soft deletion, restore and hard-delete auditing without a separate
+JavaScript framework. See the [demo solution filter](samples/Basilisque.DataAccess.EntityFramework.Demo.slnf)
+for the complete example.
+
+## Building and testing
+
+The [root solution](Basilisque.DataAccess.EntityFramework.slnx) contains all library
+and demo projects. Both GitHub build workflows use it to build and test the full
+repository. Demo projects are not packable; NuGet packaging remains limited to
+the library projects, and application publishing is disabled by default.
+
+```powershell
+dotnet build .\Basilisque.DataAccess.EntityFramework.slnx
+dotnet test --solution .\Basilisque.DataAccess.EntityFramework.slnx
+```
+
+For focused development, open the
+[library filter](src/Basilisque.DataAccess.EntityFramework.slnf) or
+[demo filter](samples/Basilisque.DataAccess.EntityFramework.Demo.slnf).
+Both reference the same root solution. The demo filter includes its required
+library projects but excludes the library test projects.
+
 ## Entity stamping and dependency injection
 `BaseDbContext<TDbContext>` automatically configures and runs entity stamping.
 Entities implementing the interfaces in `Basilisque.DataAccess.EntityFramework.Base.Stamping`

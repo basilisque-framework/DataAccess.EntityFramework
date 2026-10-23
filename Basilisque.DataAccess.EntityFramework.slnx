@@ -1,0 +1,61 @@
+<!--
+   Copyright 2025-2026 Alexander Stärk
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<Solution>
+  <Folder Name="/01_EF.Base/">
+    <Project Path="src/DataAccess.EntityFramework.Base.Unit.Tests/DataAccess.EntityFramework.Base.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.Base/DataAccess.EntityFramework.Base.csproj" />
+  </Folder>
+  <Folder Name="/02_EF.Relational/">
+    <Project Path="src/DataAccess.EntityFramework.Relational.Unit.Tests/DataAccess.EntityFramework.Relational.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.Relational/DataAccess.EntityFramework.Relational.csproj" />
+  </Folder>
+  <Folder Name="/03_CodeAnalysis/">
+    <Project Path="src/DataAccess.EntityFramework.CodeAnalysis.Unit.Tests/DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.CodeAnalysis/DataAccess.EntityFramework.CodeAnalysis.csproj" />
+  </Folder>
+  <Folder Name="/04_EF.SqlServer/">
+    <Project Path="src/DataAccess.EntityFramework.SqlServer.Unit.Tests/DataAccess.EntityFramework.SqlServer.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.SqlServer/DataAccess.EntityFramework.SqlServer.csproj" />
+  </Folder>
+  <Folder Name="/05_EF.PostgreSQL/">
+    <Project Path="src/DataAccess.EntityFramework.PostgreSQL.Unit.Tests/DataAccess.EntityFramework.PostgreSQL.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.PostgreSQL/DataAccess.EntityFramework.PostgreSQL.csproj" />
+  </Folder>
+  <Folder Name="/06_EF.SQLite/">
+    <Project Path="src/DataAccess.EntityFramework.SQLite.Unit.Tests/DataAccess.EntityFramework.SQLite.Unit.Tests.csproj" />
+    <Project Path="src/DataAccess.EntityFramework.SQLite/DataAccess.EntityFramework.SQLite.csproj" />
+  </Folder>
+  <Folder Name="/07_Demo/">
+    <Project Path="samples/Demo.Data/Demo.Data.csproj" />
+    <Project Path="samples/Demo.PostgreSQL/Demo.PostgreSQL.csproj" />
+    <Project Path="samples/Demo.SQLite/Demo.SQLite.csproj" />
+    <Project Path="samples/Demo.SqlServer/Demo.SqlServer.csproj" />
+    <Project Path="samples/Demo.Tests/Demo.Tests.csproj" />
+    <Project Path="samples/Demo.Web/Demo.Web.csproj" />
+    <File Path="samples/Directory.Build.props" />
+    <File Path="samples/Directory.Build.targets" />
+    <File Path="samples/Directory.Packages.props" />
+    <File Path="samples/README.md" />
+    <File Path="samples/appsettings.json" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+    <File Path="src/Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="global.json" />
+  </Folder>
+</Solution>

@@ -1,0 +1,7 @@
+<Project>
+  <!-- Project references do not import the provider NuGet packages' build assets. -->
+  <ItemGroup Condition="!$(MSBuildProjectName.EndsWith('.Tests'))">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\DataAccess.EntityFramework.CodeAnalysis\DataAccess.EntityFramework.CodeAnalysis.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>
