@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,7 @@ public class DataAccessEntityFrameworkGenerator : IIncrementalGenerator
     {
         var existingMigrationAssembliyProvidersProvider = MigrationAssemblyProviderGeneratorSelectors.HasExistingMigrationAssemblyProvider(context);
 
-        var combinedProvider = existingMigrationAssembliyProvidersProvider.Combine(buildPropertiesSelector).Combine(diExtensionValueProvider);
+        var combinedProvider = existingMigrationAssembliyProvidersProvider.Combine(context.CompilationProvider).Combine(buildPropertiesSelector).Combine(diExtensionValueProvider);
 
         context.RegisterCompilationInfoOutput(combinedProvider, MigrationAssemblyProviderGeneratorOutput.OutputMigrationAssemblyProviders);
     }

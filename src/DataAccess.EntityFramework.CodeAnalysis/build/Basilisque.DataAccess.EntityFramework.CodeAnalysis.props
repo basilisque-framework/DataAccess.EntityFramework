@@ -20,6 +20,7 @@
   </PropertyGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="BAS_DA_EF_IsMigrationAssembly" />
+    <CompilerVisibleProperty Include="BAS_DA_EF_DatabaseProviders" />
     <CompilerVisibleProperty Include="BAS_DA_EF_DesignTimeDbContextFactories" />
   </ItemGroup>
 </Project>

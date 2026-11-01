@@ -1,14 +1,16 @@
-﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>
-/// Defines a contract for providing information about the migration assembly used in database migrations.
+/// Provides an assembly name for a specific context and database provider.
 /// </summary>
 [RegisterServiceSingleton(As = typeof(IMigrationAssemblyProvider), ImplementsITypeName = false)]
 public interface IMigrationAssemblyProvider
 {
     /// <summary>
-    /// Retrieves the simple name of the assembly containing the current migration, if available.
+    /// Returns the matching migration assembly, or null when this provider has no matching mapping.
     /// </summary>
-    /// <returns>The simple name of the migration assembly, or <see langword="null"/> for the default Entity Framework behaviour.</returns>
-    string? GetMigrationAssemblyName();
+    /// <param name="dbContextType">The concrete context type.</param>
+    /// <param name="databaseProvider">The Basilisque database provider key.</param>
+    /// <returns>The matching assembly's simple name, or null.</returns>
+    string? GetMigrationAssemblyName(Type dbContextType, string databaseProvider);
 }

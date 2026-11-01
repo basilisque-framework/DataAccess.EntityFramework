@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,12 @@ namespace __BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__;
 /// </summary>
 public partial class MigrationAssemblyProvider : global::Basilisque.DataAccess.EntityFramework.Base.Model.MigrationAssemblyProvider
 {{
+    /// <inheritdoc />
+    public override string? GetMigrationAssemblyName(global::System.Type dbContextType, string databaseProvider)
+    {{
+__BASILISQUE_MIGRATION_MAPPINGS__
+        return null;
+    }}
 }}
 ";
 
@@ -57,8 +63,10 @@ public partial class MigrationAssemblyProvider : global::Basilisque.DataAccess.E
     /// </summary>
     /// <param name="namespace">The namespace to insert into the migration assembly provider source template. Cannot be null.</param>
     /// <returns>A string containing the migration assembly provider source code with the specified namespace applied.</returns>
-    public static string GetMigrationAssemblyProviderSource(string @namespace)
+    /// <param name="mappings">The generated context/provider selection statements.</param>
+    public static string GetMigrationAssemblyProviderSource(string @namespace, string mappings = "")
     {
-        return MigrationAssemblyProviderSourceTemplate.Replace("__BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__", @namespace);
+        return MigrationAssemblyProviderSourceTemplate.Replace("__BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__", @namespace)
+            .Replace("__BASILISQUE_MIGRATION_MAPPINGS__", mappings);
     }
 }

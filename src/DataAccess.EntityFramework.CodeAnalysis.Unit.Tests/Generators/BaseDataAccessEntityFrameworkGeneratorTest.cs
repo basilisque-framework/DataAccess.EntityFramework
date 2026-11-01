@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -221,6 +221,7 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
             is_global = true
             build_property.RootNamespace = Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests
             build_property.BAS_DA_EF_IsMigrationAssembly = true
+            build_property.BAS_DA_EF_DatabaseProviders = SqlServer,SQLite,PostgreSQL
             build_property.BAS_DA_EF_DesignTimeDbContextFactories = ,global::Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory,global::Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory,global::Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory
             """);
     }
@@ -285,9 +286,23 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
     {
         var expectedMigrationAssemblyProviderSources = GetExpectedMigrationAssemblyProviderSources(
             MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName,
-            MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource("Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated"));
+            MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource("Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated", getExpectedMappings()));
         if (expectedMigrationAssemblyProviderSources.HasValue)
             sources.Add(expectedMigrationAssemblyProviderSources.Value);
+    }
+
+    private string getExpectedMappings()
+    {
+        var names = GetExpectedDbContextFactorySources().Select(source => source.Name.Replace("DesignTimeFactory.g.cs", ""))
+            .Distinct().OrderBy(name => name, StringComparer.Ordinal);
+        var lines = new List<string>();
+        foreach (var name in names)
+        foreach (var provider in new[] { "PostgreSQL", "SQLite", "SqlServer" })
+        {
+            lines.Add($"        if (dbContextType == typeof(global::{name}) && databaseProvider == \"{provider}\")");
+            lines.Add("            return typeof(MigrationAssemblyProvider).Assembly.GetName().Name;");
+        }
+        return string.Join("\r\n", lines);
     }
 
     private static void addDependencyInjectionMock(TVerifier verifier)

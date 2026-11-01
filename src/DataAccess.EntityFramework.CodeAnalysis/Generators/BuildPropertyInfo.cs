@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,16 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators;
 
 internal readonly struct BuildPropertyInfo
 {
-    public BuildPropertyInfo(bool isMigrationAssembly, string[]? designTimeDbContextFactories, string? rootNamespace, string? assemblyName)
+    public BuildPropertyInfo(bool isMigrationAssembly, string[]? designTimeDbContextFactories, string? rootNamespace, string? assemblyName, string[]? databaseProviders = null)
     {
         IsMigrationAssembly = isMigrationAssembly;
         DesignTimeDbContextFactories = designTimeDbContextFactories;
         RootNamespace = rootNamespace;
         AssemblyName = assemblyName;
+        DatabaseProviders = databaseProviders ?? [];
     }
+
+    public string[] DatabaseProviders { get; }
 
     public bool IsMigrationAssembly { get; }
     public string[]? DesignTimeDbContextFactories { get; }

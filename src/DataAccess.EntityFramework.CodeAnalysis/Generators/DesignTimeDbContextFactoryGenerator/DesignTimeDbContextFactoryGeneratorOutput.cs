@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,6 +61,9 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
 
     private static ImmutableArray<string> getActiveDesignTimeFactories(ImmutableArray<INamedTypeSymbol> designTimeFactories, string[]? designTimeDbContextFactories)
     {
+        if (designTimeDbContextFactories is null)
+            return ImmutableArray<string>.Empty;
+
         var baseDesignTimeFactoryFQName = designTimeFactories.Select(s => s.ToDisplayString(_baseDesignTimeFactorySymbolDisplayFormat));
 
         return baseDesignTimeFactoryFQName.Where(f => designTimeDbContextFactories.Contains(f)).OrderBy(s => s).ToImmutableArray();
@@ -72,7 +75,7 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         {
             classInfo.BaseClass = $"{baseDesignTimeFactoryFQName}<{fullQualifiedDbContextName}>";
 
-            addMigrationAssemblyProviderRegistration(classInfo, buildProperties);
+            addMigrationAssemblyProviderRegistration(classInfo, buildProperties, fullQualifiedDbContextName);
         });
     }
 
@@ -104,13 +107,12 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
 
             classInfo.Methods.Add(m);
 
-            addMigrationAssemblyProviderRegistration(classInfo, buildProperties);
+            addMigrationAssemblyProviderRegistration(classInfo, buildProperties, fullQualifiedDbContextName);
         });
     }
 
-    private static void addMigrationAssemblyProviderRegistration(ClassInfo classInfo, BuildPropertyInfo buildProperties)
+    private static void addMigrationAssemblyProviderRegistration(ClassInfo classInfo, BuildPropertyInfo buildProperties, string contextType)
     {
-        var migrationAssemblyProviderNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(buildProperties);
 
         var m = new MethodInfo(AccessModifier.Protected, "sealed override void", "ConfigureMigrationAssemblyProvider")
         {
@@ -120,7 +122,12 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         m.Parameters.Add(new ParameterInfo(ParameterKind.Ordinary, "global::Microsoft.Extensions.DependencyInjection.IServiceCollection", "services"));
         m.Parameters.Add(new ParameterInfo(ParameterKind.Ordinary, "string[]", "args"));
 
-        m.Body.Add($"global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::{migrationAssemblyProviderNamespace}.MigrationAssemblyProvider>(services);");
+        // The selected factory owns the target assembly even before its first snapshot exists.
+        foreach (var provider in buildProperties.DatabaseProviders)
+        {
+            var providerLiteral = Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(provider, true);
+            m.Body.Add($"global::Basilisque.DataAccess.EntityFramework.Base.DependencyInjection.MigrationAssemblyServiceCollectionExtensions.AddMigrationAssembly<global::{contextType}>(services, {providerLiteral}, typeof({classInfo.ClassName}).Assembly);");
+        }
 
         classInfo.Methods.Add(m);
     }

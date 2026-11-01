@@ -16,29 +16,35 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   
   <!-- define NuGet package versions -->
   <ItemGroup>
+    <!-- workaround for https://github.com/dotnet/SqlClient/issues/4843 -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
+    
     <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.1-Preview00001" />
     <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.1-Preview00001" />
     <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-Preview00012" />
     <PackageVersion Include="Basilisque.Core" Version="1.0.0-Preview00002" />
     <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-Preview00022" />
     <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-Preview00022" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13" />
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
-    <PackageVersion Include="TUnit" Version="1.72.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
+    <PackageVersion Include="TUnit" Version="1.76.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="GitVersion.MsBuild" Version="6.8.2" />
   </ItemGroup>

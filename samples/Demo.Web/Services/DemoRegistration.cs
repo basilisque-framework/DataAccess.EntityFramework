@@ -1,22 +1,15 @@
-using Basilisque.DataAccess.EntityFramework.Base.Model;
-
 namespace Basilisque.Demo.Web.Services;
 
+/// <summary>Registers the sample and its provider dependencies.</summary>
 public static class DemoRegistration
 {
+    /// <summary>Registers generated application and framework services.</summary>
+    /// <param name="services">The application services.</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>The application services.</returns>
     public static IServiceCollection AddDemo(this IServiceCollection services, IConfiguration configuration)
     {
         Basilisque.Demo.Web.IServiceCollectionExtensions.RegisterServices(services);
-
-        // All three migration assemblies are dependencies. Select one explicitly after the generated chain.
-        IMigrationAssemblyProvider migrations = configuration["Database:Provider"] switch
-        {
-            "SQLite" => new SQLite.Generated.MigrationAssemblyProvider(),
-            "SqlServer" => new SqlServer.Generated.MigrationAssemblyProvider(),
-            "PostgreSQL" => new PostgreSQL.Generated.MigrationAssemblyProvider(),
-            _ => throw new InvalidOperationException("Database:Provider must be SQLite, SqlServer or PostgreSQL.")
-        };
-        services.AddSingleton(migrations);
         return services;
     }
 }

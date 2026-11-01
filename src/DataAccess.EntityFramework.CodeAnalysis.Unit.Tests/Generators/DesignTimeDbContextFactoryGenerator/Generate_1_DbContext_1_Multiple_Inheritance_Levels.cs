@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,9 @@ public partial class MyDbContextDesignTimeFactory : global::Basilisque.DataAcces
     /// <inheritdoc />
     protected sealed override void ConfigureMigrationAssemblyProvider(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services, string[] args)
     {{
-        global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider, global::Basilisque.DataAccess.EntityFramework.CodeAnalysis.Unit.Tests.Generated.MigrationAssemblyProvider>(services);
+        global::Basilisque.DataAccess.EntityFramework.Base.DependencyInjection.MigrationAssemblyServiceCollectionExtensions.AddMigrationAssembly<global::DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext>(services, ""PostgreSQL"", typeof(MyDbContextDesignTimeFactory).Assembly);
+        global::Basilisque.DataAccess.EntityFramework.Base.DependencyInjection.MigrationAssemblyServiceCollectionExtensions.AddMigrationAssembly<global::DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext>(services, ""SQLite"", typeof(MyDbContextDesignTimeFactory).Assembly);
+        global::Basilisque.DataAccess.EntityFramework.Base.DependencyInjection.MigrationAssemblyServiceCollectionExtensions.AddMigrationAssembly<global::DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext>(services, ""SqlServer"", typeof(MyDbContextDesignTimeFactory).Assembly);
     }}
 }}
 
@@ -103,4 +105,3 @@ public class MyDbContext : CustomBaseDbContext<MyDbContext>
         yield return ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory;
     }
 }
-

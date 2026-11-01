@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Demo.Web\Demo.Web.csproj" />
+    <ProjectReference Include="..\Demo.SQLite\Demo.SQLite.csproj" Aliases="global,SQLiteMigrations" />
+    <ProjectReference Include="..\Demo.SqlServer\Demo.SqlServer.csproj" Aliases="global,SqlServerMigrations" />
+    <ProjectReference Include="..\Demo.PostgreSQL\Demo.PostgreSQL.csproj" Aliases="global,PostgreSQLMigrations" />
   </ItemGroup>
 </Project>

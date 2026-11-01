@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +47,9 @@ internal class CommonGeneratorSelectors
         provider.GlobalOptions.TryGetValue("build_property.RootNamespace", out string? rootNamespace);
         provider.GlobalOptions.TryGetValue("build_property.AssemblyName", out string? assemblyName);
 
-        return new BuildPropertyInfo(isMigrationAssembly, dbContextFactories, rootNamespace, assemblyName);
+        provider.GlobalOptions.TryGetValue("build_property.BAS_DA_EF_DatabaseProviders", out var databaseProviders);
+        return new BuildPropertyInfo(isMigrationAssembly, dbContextFactories, rootNamespace, assemblyName,
+            databaseProviders?.Split(_dbContextFactoriesSeparators, System.StringSplitOptions.RemoveEmptyEntries)
+                .Select(value => value.Trim()).Where(value => value.Length > 0).Distinct().OrderBy(value => value).ToArray());
     }
 }

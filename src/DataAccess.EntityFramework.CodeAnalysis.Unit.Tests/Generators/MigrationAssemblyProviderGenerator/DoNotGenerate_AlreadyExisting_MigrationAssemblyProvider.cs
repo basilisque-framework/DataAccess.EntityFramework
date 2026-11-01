@@ -36,7 +36,7 @@ using Microsoft.EntityFrameworkCore.Design;
 public sealed class CustomMigrationAssemblyProvider : Basilisque.DataAccess.EntityFramework.Base.Model.IMigrationAssemblyProvider
 {
     /// <inheritdoc />
-    public string? GetMigrationAssemblyName()
+    public string? GetMigrationAssemblyName(System.Type dbContextType, string databaseProvider)
     {
         return ""CustomAssembly"";
     }

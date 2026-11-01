@@ -147,9 +147,10 @@ not ASP.NET Core's unrelated root `ConnectionStrings` section.
   chain. DbContext registration, annotated scenario services, provider services,
   stamping, scoped Core user contexts and audit interceptors are not reimplemented.
 - Each provider assembly gets a **generated `MigrationAssemblyProvider`**.
-  Because the host references all three assemblies, it explicitly selects one
-  after the generated registration chain. The library's provider configurators
-  use this selection; no parallel `UseSqlite`/`UseSqlServer` configuration is added.
+  Its mappings identify both the DbContext and DBMS. The library resolves the
+  matching assembly automatically even when the host references all three
+  providers. No manual selection or parallel `UseSqlite`/`UseSqlServer`
+  configuration is needed.
 - [DemoDbInitializer.cs](Demo.Data/DemoDbInitializer.cs) derives from the library's
   relational `DbInitializer`. Its inherited `IDbInitializer` annotation supplies
   registration. Startup invokes the four lifecycle methods in order in a
@@ -226,3 +227,26 @@ For **all three providers**, offline tests also verify provider resolution,
 migration assembly selection, absence of pending model changes and SQL script
 generation. These offline checks do **not** replace live SQL Server/PostgreSQL
 tests; use the UI walkthrough against your dedicated server databases too.
+
+## Migration assembly selection regression tests
+
+[MigrationAssemblyCollisionTests.cs](Demo.Tests/MigrationAssemblyCollisionTests.cs)
+uses the actual generated registration chain without a manual assembly selector.
+It verifies the correct assembly for each DBMS, executes migrations on a fresh
+SQLite in-memory database, and tests the actual generated design-time factories
+through assembly aliases. It also checks that unrelated contexts do not inherit
+the demo's migration mapping.
+
+```powershell
+dotnet test --project samples/Demo.Tests/Demo.Tests.csproj -c Release
+```
+
+The former defect was an unqualified `IMigrationAssemblyProvider` dependency:
+the last registered assembly was used for every DBMS. The sample previously
+overrode that choice manually in `DemoRegistration`. That workaround has been
+removed. These tests now expect correct automatic selection.
+
+No SQL Server or PostgreSQL instance is needed: their models and migration
+assemblies are inspected without connecting. Database operations execute only
+against temporary SQLite databases. See the repository's migration assembly
+selection documentation for the breaking API changes and explicit overrides.

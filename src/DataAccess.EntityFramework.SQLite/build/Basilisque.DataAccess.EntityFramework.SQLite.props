@@ -15,6 +15,7 @@
 -->
 <Project>
   <PropertyGroup>
+    <BAS_DA_EF_DatabaseProviders>$(BAS_DA_EF_DatabaseProviders),SQLite</BAS_DA_EF_DatabaseProviders>
     <BAS_DA_EF_IsMigrationAssembly Condition="'$(BAS_DA_EF_IsMigrationAssembly)' == ''">true</BAS_DA_EF_IsMigrationAssembly>
     <BAS_DA_EF_DesignTimeDbContextFactories>$(BAS_DA_EF_DesignTimeDbContextFactories),global::Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory</BAS_DA_EF_DesignTimeDbContextFactories>
   </PropertyGroup>

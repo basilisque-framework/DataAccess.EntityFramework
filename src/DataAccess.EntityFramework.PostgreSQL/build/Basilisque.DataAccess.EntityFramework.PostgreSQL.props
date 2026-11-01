@@ -15,6 +15,7 @@
 -->
 <Project>
   <PropertyGroup>
+    <BAS_DA_EF_DatabaseProviders>$(BAS_DA_EF_DatabaseProviders),PostgreSQL</BAS_DA_EF_DatabaseProviders>
     <BAS_DA_EF_IsMigrationAssembly Condition="'$(BAS_DA_EF_IsMigrationAssembly)' == ''">true</BAS_DA_EF_IsMigrationAssembly>
     <BAS_DA_EF_DesignTimeDbContextFactories>$(BAS_DA_EF_DesignTimeDbContextFactories),global::Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory</BAS_DA_EF_DesignTimeDbContextFactories>
   </PropertyGroup>

@@ -20,6 +20,7 @@
     <LangVersion>latest</LangVersion>
     <BAS_CB_Set_LangVersion>false</BAS_CB_Set_LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <EnableAnalyzerReleaseTracking>true</EnableAnalyzerReleaseTracking>
     <!-- ExtensionSupport already bundles the CodeAnalysis helper assembly. -->
     <BAS_CA_Dependency_PackCS>false</BAS_CA_Dependency_PackCS>
   </PropertyGroup>
@@ -35,6 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     <None Include="build/**" Pack="true" PackagePath="build" />
     <None Include="build/**" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +26,11 @@ namespace Basilisque.DataAccess.EntityFramework.PostgreSQL.Model;
 internal class PostgreSQLDbContextOptionsConfigurator : BaseDbContextOptionsConfigurator
 {
     private readonly IConnectionStringBuilder _connectionStringBuilder;
-    private readonly IMigrationAssemblyProvider? _migrationAssemblyProvider;
+    private readonly IMigrationAssemblyResolver? _migrationAssemblyProvider;
 
     public PostgreSQLDbContextOptionsConfigurator(
         [FromKeyedServices(PostgreSQLDbProviderInfo.ProviderKeyName)] IConnectionStringBuilder connectionStringBuilder,
-        IMigrationAssemblyProvider? migrationAssemblyProvider = null
+        IMigrationAssemblyResolver? migrationAssemblyProvider = null
         )
     {
         ArgumentNullException.ThrowIfNull(connectionStringBuilder);
@@ -45,7 +45,7 @@ internal class PostgreSQLDbContextOptionsConfigurator : BaseDbContextOptionsConf
 
         optionsBuilder.UseNpgsql(connectionString, o =>
         {
-            var migrationAssemblyName = _migrationAssemblyProvider?.GetMigrationAssemblyName();
+            var migrationAssemblyName = _migrationAssemblyProvider?.GetMigrationAssemblyName(typeof(TDbContext), PostgreSQLDbProviderInfo.ProviderKeyName);
             if (migrationAssemblyName is not null)
                 o.MigrationsAssembly(migrationAssemblyName);
         });

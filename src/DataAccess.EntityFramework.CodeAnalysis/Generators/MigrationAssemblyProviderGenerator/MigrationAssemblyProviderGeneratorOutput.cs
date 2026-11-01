@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2026-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,17 +21,19 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTi
 
 internal static class MigrationAssemblyProviderGeneratorOutput
 {
-    internal static void OutputMigrationAssemblyProviders(SourceProductionContext context, ((bool HasExistingMigrationAssemblyProvider, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
+    internal static void OutputMigrationAssemblyProviders(SourceProductionContext context, (((bool HasExistingMigrationAssemblyProvider, Compilation Compilation) CompilationInfo, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
     {
         if (!data.Input.BuildProperties.IsMigrationAssembly)
             return;
 
-        if (data.Input.HasExistingMigrationAssemblyProvider)
+        if (data.Input.CompilationInfo.HasExistingMigrationAssemblyProvider)
             return;
 
         var outputNamespace = MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderNamespace(data.Input.BuildProperties);
 
-        context.AddSource(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName, MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource(outputNamespace));
+        var mappings = MigrationMappingSelector.GetMappings(context, data.Input.CompilationInfo.Compilation, data.Input.BuildProperties);
+        context.AddSource(MigrationAssemblyProviderGeneratorData.MigrationAssemblyProviderCompilationName,
+            MigrationAssemblyProviderGeneratorData.GetMigrationAssemblyProviderSource(outputNamespace, mappings));
 
         var migrationAssemblyProviderFQN = $"{outputNamespace}.MigrationAssemblyProvider";
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -176,6 +176,7 @@ public abstract class BaseDesignTimeDbContextFactory<TDbContext> : IDesignTimeDb
     {
         services.AddSingleton<IConfiguration>(sp => CreateConfiguration(sp, args));
         services.AddTransient<IDbProviderServiceProvider, DbProviderServiceProvider>();
+        services.AddSingleton<IMigrationAssemblyResolver, MigrationAssemblyResolver>();
         services.AddSingleton<IConnectionStringBuilder, ConnectionStringBuilder>();
         services.AddScoped<CompositeStampInterceptor>();
 

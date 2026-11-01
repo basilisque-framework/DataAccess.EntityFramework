@@ -23,7 +23,7 @@
     <!-- Do not execute the DataAccess.EntityFramework.CodeAnalysis source generator in the project -->
     <ItemGroup>
       <Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Filename)').Contains('DataAccess.EntityFramework.CodeAnalysis'))" />
-      <Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Filename)').Contains('Basilisque.CodeAnalysis'))" />
+
     </ItemGroup>
   </Target>
 </Project>
