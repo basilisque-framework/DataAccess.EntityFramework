@@ -28,6 +28,5 @@
 
   <ItemGroup>
     <None Include="build/**" Pack="true" PackagePath="build" />
-    <None Include="build/**" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 </Project>

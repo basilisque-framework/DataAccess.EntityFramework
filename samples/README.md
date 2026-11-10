@@ -140,8 +140,9 @@ not ASP.NET Core's unrelated root `ConnectionStrings` section.
 - [Directory.Build.targets](Directory.Build.targets) references the repository's
   EF source generator as an analyzer. Provider projects explicitly import their
   provider build props because `ProjectReference` does not import NuGet build
-  assets. This mirrors the automatic imports that installed provider packages
-  supply to a normal consuming application.
+  assets. This mirrors the automatic imports supplied by a direct provider
+  package reference in a migration project. Transitive provider dependencies do
+  not enable migration generation in the host.
 - [DemoRegistration.cs](Demo.Web/Services/DemoRegistration.cs) calls the **web
   application's generated registration entry point**, including its dependency
   chain. DbContext registration, annotated scenario services, provider services,

@@ -6,7 +6,6 @@
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <IsPackable>false</IsPackable>
     <BAS_CB_Set_GenerateDocumentationFile>false</BAS_CB_Set_GenerateDocumentationFile>
-    <BAS_DA_EF_IsMigrationAssembly>false</BAS_DA_EF_IsMigrationAssembly>
   </PropertyGroup>
   <Import Project="..\src\DataAccess.EntityFramework.CodeAnalysis\build\Basilisque.DataAccess.EntityFramework.CodeAnalysis.props" />
 </Project>
