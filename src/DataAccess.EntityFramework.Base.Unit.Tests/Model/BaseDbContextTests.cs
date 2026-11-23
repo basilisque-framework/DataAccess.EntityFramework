@@ -70,6 +70,24 @@ public class BaseDbContextTests
         }
     }
 
+    /// <summary>
+    /// Verifies that one context's migration status does not affect another instance of the same type.
+    /// </summary>
+    [Test]
+    public async Task WasAlreadyMigrated_ShouldRemainFalse_InAnotherContextInstance()
+    {
+        // Arrange
+        var providerServices = Substitute.For<IDbProviderServiceProvider>();
+        using var firstContext = new TestDbContext(providerServices);
+        using var secondContext = new TestDbContext(providerServices);
+
+        // Act
+        ((IInitializableDbContext)firstContext).WasAlreadyMigrated = true;
+
+        // Assert
+        await Assert.That(((IInitializableDbContext)secondContext).WasAlreadyMigrated).IsFalse();
+    }
+
     [Test]
     public async Task OnConfiguring_invokes_configurator()
     {

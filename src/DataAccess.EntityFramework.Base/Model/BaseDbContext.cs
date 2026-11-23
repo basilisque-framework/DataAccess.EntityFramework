@@ -31,7 +31,6 @@ namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbContext, IDbContextDesignSupport, IDbContextDesignTimeLifetimeOwner
     where TDbContext : BaseDbContext<TDbContext>
 {
-    private static bool _wasAlreadyMigrated = false;
     private readonly IDbProviderServiceProvider _dbProviderServiceProvider;
     private IDbContextOptionsConfigurator? _dbContextOptionsConfigurator = null;
     private IDbProviderInfo? _dbProviderInfo = null;
@@ -54,7 +53,7 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
     public bool IsDesignTime { get; private set; }
 
     /// <inheritdoc />
-    bool IInitializableDbContext.WasAlreadyMigrated { get => _wasAlreadyMigrated; set => _wasAlreadyMigrated = value; }
+    bool IInitializableDbContext.WasAlreadyMigrated { get; set; }
 
     /// <inheritdoc />
     bool IDbContextDesignSupport.IsDesignTime { get => IsDesignTime; set => IsDesignTime = value; }

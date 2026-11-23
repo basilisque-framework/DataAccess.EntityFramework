@@ -22,9 +22,7 @@ namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 public interface IInitializableDbContext
 {
     /// <summary>
-    /// Indicates whether the current DbContext was already migrated.
+    /// Indicates whether the initializer has already migrated this context instance.
     /// </summary>
-    /// <remarks>Internally saves this state in a <see langword="static"/> field.</remarks>
-    /// <returns>A boolean value indicating whether the current DbContext was already migrated.</returns>
     bool WasAlreadyMigrated { get; set; }
 }
