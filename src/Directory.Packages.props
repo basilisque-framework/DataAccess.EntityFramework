@@ -21,32 +21,48 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <EntityFrameworkCoreVersion>10.0.15</EntityFrameworkCoreVersion>
+    <ExtensionsVersion>10.0.15</ExtensionsVersion>
+    <RoslynVersion>5.0.0</RoslynVersion>
+    <NpgsqlEntityFrameworkCoreVersion>10.0.4</NpgsqlEntityFrameworkCoreVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <EntityFrameworkCoreVersion>11.0.0</EntityFrameworkCoreVersion>
+    <ExtensionsVersion>11.0.0</ExtensionsVersion>
+    <RoslynVersion>5.9.0</RoslynVersion>
+    <NpgsqlEntityFrameworkCoreVersion>11.0.0</NpgsqlEntityFrameworkCoreVersion>
+  </PropertyGroup>
+
   <!-- define NuGet package versions -->
   <ItemGroup>
-    <!-- workaround for https://github.com/dotnet/SqlClient/issues/4843 -->
-    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
-
-    <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.1-Preview00001" />
-    <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.1-Preview00001" />
-    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-Preview00012" />
-    <PackageVersion Include="Basilisque.Core" Version="1.0.0-Preview00002" />
-    <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-Preview00022" />
-    <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-Preview00022" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13" />
+    <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.1-RC00006" />
+    <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.1-RC00006" />
+    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-RC00015" />
+    <PackageVersion Include="Basilisque.Core" Version="1.0.0-RC00004" />
+    <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-RC00026" />
+    <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-RC00026" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(ExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(ExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(ExtensionsVersion)" />
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
-    <PackageVersion Include="TUnit" Version="1.76.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
-    <PackageVersion Include="GitVersion.MsBuild" Version="6.8.2" />
+    <PackageVersion Include="TUnit" Version="1.87.12" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(NpgsqlEntityFrameworkCoreVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.12.0" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="7.0.1" />
+  </ItemGroup>
+
+  <!-- Keep the Roslyn workspace libraries used by the source generator test harness aligned. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'DataAccess.EntityFramework.CodeAnalysis.Unit.Tests'">
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)" />
   </ItemGroup>
 
   <!-- Common Packages -->

@@ -40,7 +40,9 @@ jobs:
       projectOrSolution: 'Basilisque.DataAccess.EntityFramework.slnx'
       sonarProjectKey: 'basilisque-framework_DataAccess.EntityFramework'
       sonarOrganization: 'basilisque-framework'
-      publishTargetFramework: 'net8.0'
+      dotNetVersion: |
+        10.0.x
+        11.0.x
       runDotnetPublish: false
       runDotnetPack: true
     secrets: inherit

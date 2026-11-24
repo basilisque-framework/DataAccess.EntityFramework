@@ -24,6 +24,7 @@
     <PackageReference Include="Basilisque.CodeAnalysis.TestSupport" />
     <PackageReference Include="Basilisque.CodeAnalysis" IncludeAssets="runtime" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess.EntityFramework.PostgreSQL\DataAccess.EntityFramework.PostgreSQL.csproj" />

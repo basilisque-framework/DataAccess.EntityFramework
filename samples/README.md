@@ -11,10 +11,10 @@ not an identity system. Keep the server bound to loopback.
 
 ## Quick start
 
-From the repository root, using a .NET 10 SDK or newer:
+From the repository root, using the .NET 11 SDK:
 
 ```powershell
-dotnet run --project .\samples\Demo.Web\Demo.Web.csproj -- --urls http://localhost:5187
+dotnet run --project .\samples\Demo.Web\Demo.Web.csproj --framework net11.0 -- --urls http://localhost:5187
 ```
 
 Open <http://localhost:5187>. SQLite is the default and needs no external server.
@@ -28,7 +28,7 @@ directory. For a deterministic location, set an absolute path:
 
 ```powershell
 $env:Database__ConnectionStrings__SQLite = 'Data Source=C:\Temp\basilisque-demo.db'
-dotnet run --project .\samples\Demo.Web\Demo.Web.csproj -- --urls http://localhost:5187
+dotnet run --project .\samples\Demo.Web\Demo.Web.csproj --framework net11.0 -- --urls http://localhost:5187
 ```
 
 The parent directory must already exist. Local SQLite files under this sample
@@ -75,7 +75,7 @@ existing Blazor circuit or reuse a provider's database/migrations for another.
 
 ```powershell
 $env:Database__Provider = 'SQLite'
-dotnet run --project .\samples\Demo.Web\Demo.Web.csproj -- --urls http://localhost:5187
+dotnet run --project .\samples\Demo.Web\Demo.Web.csproj --framework net11.0 -- --urls http://localhost:5187
 ```
 
 ### SQL Server
@@ -86,7 +86,7 @@ Otherwise supply your own dedicated SQL Server demo connection:
 ```powershell
 $env:Database__Provider = 'SqlServer'
 $env:Database__ConnectionStrings__SqlServer = 'Server=localhost;Database=BasilisqueEfDemo;Integrated Security=true;TrustServerCertificate=true'
-dotnet run --project .\samples\Demo.Web\Demo.Web.csproj -- --urls http://localhost:5187
+dotnet run --project .\samples\Demo.Web\Demo.Web.csproj --framework net11.0 -- --urls http://localhost:5187
 ```
 
 `TrustServerCertificate` is only a local-development convenience. SQL Server
@@ -98,7 +98,7 @@ an independent relational feature.
 ```powershell
 $env:Database__Provider = 'PostgreSQL'
 $env:Database__ConnectionStrings__PostgreSQL = 'Host=localhost;Database=basilisque_ef_demo;Username=postgres'
-dotnet run --project .\samples\Demo.Web\Demo.Web.csproj -- --urls http://localhost:5187
+dotnet run --project .\samples\Demo.Web\Demo.Web.csproj --framework net11.0 -- --urls http://localhost:5187
 ```
 
 Configure credentials locally through environment variables or .NET user secrets;
@@ -181,7 +181,7 @@ dotnet tool restore
 dotnet build .\Basilisque.DataAccess.EntityFramework.Demo.slnf
 ```
 
-The pinned local `dotnet-ef` version matches the repository's EF Core version.
+The pinned local `dotnet-ef` version matches the .NET 10 target's EF Core version.
 Each provider project is its own EF tooling startup project. Its generated
 factory discovers the shared [appsettings.json](appsettings.json) from this
 directory and reads environment overrides (not the web project's user secrets).
@@ -190,13 +190,13 @@ After changing the shared model, add a migration for **each** provider:
 
 ```powershell
 $env:Database__Provider = 'SQLite'
-dotnet ef migrations add DescribeYourChange --project .\Demo.SQLite --startup-project .\Demo.SQLite --output-dir Migrations
+dotnet ef migrations add DescribeYourChange --project .\Demo.SQLite --startup-project .\Demo.SQLite --framework net10.0 --output-dir Migrations
 
 $env:Database__Provider = 'SqlServer'
-dotnet ef migrations add DescribeYourChange --project .\Demo.SqlServer --startup-project .\Demo.SqlServer --output-dir Migrations
+dotnet ef migrations add DescribeYourChange --project .\Demo.SqlServer --startup-project .\Demo.SqlServer --framework net10.0 --output-dir Migrations
 
 $env:Database__Provider = 'PostgreSQL'
-dotnet ef migrations add DescribeYourChange --project .\Demo.PostgreSQL --startup-project .\Demo.PostgreSQL --output-dir Migrations
+dotnet ef migrations add DescribeYourChange --project .\Demo.PostgreSQL --startup-project .\Demo.PostgreSQL --framework net10.0 --output-dir Migrations
 ```
 
 These commands generate migrations without needing a live database. Use the same

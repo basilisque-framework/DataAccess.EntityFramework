@@ -1,1 +1,3 @@
-next-version: 1.0.0
+calculation:
+  next-version: 1.0.0
+output: {}

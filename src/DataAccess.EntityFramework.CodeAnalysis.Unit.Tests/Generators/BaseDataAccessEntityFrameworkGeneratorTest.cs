@@ -63,6 +63,12 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
     {
         var verifier = GetVerifier();
 
+#if NET11_0
+        const SourceHashAlgorithm checksumAlgorithm = SourceHashAlgorithm.Sha256;
+#else
+        const SourceHashAlgorithm checksumAlgorithm = SourceHashAlgorithm.Sha1;
+#endif
+
         var expectedSources = getExpectedSources();
         foreach (var expectedSource in expectedSources)
         {
@@ -71,7 +77,7 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
             if (!name.EndsWith(".cs"))
                 name = $"{name}.cs";
 
-            verifier.TestState.GeneratedSources.Add((typeof(TGenerator), name, SourceText.From(expectedSource.SourceText, Encoding.UTF8)));
+            verifier.TestState.GeneratedSources.Add((typeof(TGenerator), name, SourceText.From(expectedSource.SourceText, Encoding.UTF8, checksumAlgorithm)));
         }
 
         await verifier.RunAsync();
@@ -149,25 +155,21 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
 
     protected ReferenceAssemblies GetReferenceAssemblies()
     {
-#if NET8_0
-        var refAssemblies = ReferenceAssemblies.Net.Net80.WithPackages([
-            new("Microsoft.AspNetCore.App.Ref", "8.0.0")
-            ]);
-#elif NET10_0
-        var refAssemblies = new Microsoft.CodeAnalysis.Testing.ReferenceAssemblies(
-                    "net10.0",
-                    new Microsoft.CodeAnalysis.Testing.PackageIdentity(
-                        "Microsoft.NETCore.App.Ref",
-                        "10.0.0"),
-                    Path.Combine("ref", "net10.0"))
-                .WithPackages([
-                    new Microsoft.CodeAnalysis.Testing.PackageIdentity("Microsoft.AspNetCore.App.Ref", "10.0.0"),
-                ]);
+#if NET11_0
+        const string targetFramework = "net11.0";
+        const string referenceVersion = "11.0.0";
 #else
-                throw new PlatformNotSupportedException("Please define reference assemblies for your platform!");
+        const string targetFramework = "net10.0";
+        const string referenceVersion = "10.0.0";
 #endif
 
-        return refAssemblies;
+        return new ReferenceAssemblies(
+            targetFramework,
+            new PackageIdentity("Microsoft.NETCore.App.Ref", referenceVersion),
+            Path.Combine("ref", targetFramework))
+            .WithPackages([
+                new PackageIdentity("Microsoft.AspNetCore.App.Ref", referenceVersion),
+            ]);
     }
 
     protected virtual IEnumerable<MetadataReference> GetMigrationAssemblyReferences()

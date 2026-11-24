@@ -91,6 +91,8 @@ for the complete example.
 
 ## Building and testing
 
+Use the .NET 11 SDK and install the .NET 10 and .NET 11 runtimes to run the full test suite.
+
 The [root solution](Basilisque.DataAccess.EntityFramework.slnx) contains all library
 and demo projects. Both GitHub build workflows use it to build and test the full
 repository. Demo projects are not packable; NuGet packaging remains limited to
@@ -497,6 +499,12 @@ entities cannot be manually inserted, changed or deleted through the ChangeTrack
 this is not a database security boundary or a tamper-proof audit log.
 The feature uses runtime generic construction and reflection for inferred audit
 types; Native AOT, trimming, and compiled models are not currently guaranteed.
+
+## Documentation
+
+See the [project wiki](https://github.com/basilisque-framework/DataAccess.EntityFramework/wiki)
+for installation, configuration, migration assembly selection and feature guides.
+Start with [Getting Started](https://github.com/basilisque-framework/DataAccess.EntityFramework/wiki/Getting-Started).
 
 ## License
 The Basilisque framework (including this repository) is licensed under the [Apache License, Version 2.0](LICENSE.txt).
