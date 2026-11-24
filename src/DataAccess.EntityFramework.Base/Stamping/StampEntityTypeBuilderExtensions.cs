@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ public static class StampEntityTypeBuilderExtensions
             ArgumentNullException.ThrowIfNull(builder);
 
             configureProperty(builder.Property<DateTimeOffset>(nameof(IStampCreateDate.CreatedAt)).Metadata, StampPropertyKind.CreatedAt);
-            configureProperty(builder.Property<TUserKey>(nameof(IStampCreateUser<TUserKey>.CreatedBy)).Metadata, StampPropertyKind.CreatedBy);
+            configureProperty(builder.Property<TUserKey>(nameof(IStampCreateUser<>.CreatedBy)).Metadata, StampPropertyKind.CreatedBy);
 
             return builder;
         }
@@ -52,7 +52,7 @@ public static class StampEntityTypeBuilderExtensions
             ArgumentNullException.ThrowIfNull(builder);
 
             configureProperty(builder.Property<DateTimeOffset>(nameof(IStampModifyDate.ModifiedAt)).Metadata, StampPropertyKind.ModifiedAt);
-            configureProperty(builder.Property<TUserKey>(nameof(IStampModifyUser<TUserKey>.ModifiedBy)).Metadata, StampPropertyKind.ModifiedBy);
+            configureProperty(builder.Property<TUserKey>(nameof(IStampModifyUser<>.ModifiedBy)).Metadata, StampPropertyKind.ModifiedBy);
 
             return builder;
         }

@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,12 +23,12 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTi
 
 internal static class DesignTimeDbContextFactoryGeneratorOutput
 {
-    private static SymbolDisplayFormat _baseDesignTimeFactorySymbolDisplayFormat = new SymbolDisplayFormat(
+    private static readonly SymbolDisplayFormat _baseDesignTimeFactorySymbolDisplayFormat = new(
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
         genericsOptions: SymbolDisplayGenericsOptions.None);
 
-    private static SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobalNamespace = SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
+    private static readonly SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobalNamespace = SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
     internal static void OutputImplementations(SourceProductionContext context, ((DesignTimeDbContextFactoryGeneratorInfo GeneratorInfo, BuildPropertyInfo BuildProperties) Input, (string? RootNamespace, string? AssemblyName) DIInfo) data, RegistrationOptions registrationOptions)
     {
@@ -54,24 +54,24 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
             return;
 
         if (baseDesignTimeFactoryFQNames.Length > 1)
-            outputMultipleProviders(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
+            outputMultipleProviders(registrationOptions, dbContexts, baseDesignTimeFactoryFQNames, data.Input.BuildProperties);
         else
-            outputSingleProvider(context, registrationOptions, dbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);
+            outputSingleProvider(registrationOptions, dbContexts, baseDesignTimeFactoryFQNames[0], data.Input.BuildProperties);
     }
 
     private static ImmutableArray<string> getActiveDesignTimeFactories(ImmutableArray<INamedTypeSymbol> designTimeFactories, string[]? designTimeDbContextFactories)
     {
         if (designTimeDbContextFactories is null)
-            return ImmutableArray<string>.Empty;
+            return [];
 
         var baseDesignTimeFactoryFQName = designTimeFactories.Select(s => s.ToDisplayString(_baseDesignTimeFactorySymbolDisplayFormat));
 
-        return baseDesignTimeFactoryFQName.Where(f => designTimeDbContextFactories.Contains(f)).OrderBy(s => s).ToImmutableArray();
+        return [.. baseDesignTimeFactoryFQName.Where(f => designTimeDbContextFactories.Contains(f)).OrderBy(s => s)];
     }
 
-    private static void outputSingleProvider(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, string baseDesignTimeFactoryFQName, BuildPropertyInfo buildProperties)
+    private static void outputSingleProvider(RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, string baseDesignTimeFactoryFQName, BuildPropertyInfo buildProperties)
     {
-        outputProvider(context, registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
+        outputProvider(registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
         {
             classInfo.BaseClass = $"{baseDesignTimeFactoryFQName}<{fullQualifiedDbContextName}>";
 
@@ -79,9 +79,9 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         });
     }
 
-    private static void outputMultipleProviders(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, ImmutableArray<string> baseDesignTimeFactoryFQNames, BuildPropertyInfo buildProperties)
+    private static void outputMultipleProviders(RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, ImmutableArray<string> baseDesignTimeFactoryFQNames, BuildPropertyInfo buildProperties)
     {
-        outputProvider(context, registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
+        outputProvider(registrationOptions, dbContexts, (fullQualifiedDbContextName, classInfo) =>
         {
             classInfo.BaseClass = $"global::Basilisque.DataAccess.EntityFramework.Base.Design.BaseDesignTimeDbContextFactory<{fullQualifiedDbContextName}>";
 
@@ -132,7 +132,7 @@ internal static class DesignTimeDbContextFactoryGeneratorOutput
         classInfo.Methods.Add(m);
     }
 
-    private static void outputProvider(SourceProductionContext context, RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, Action<string, ClassInfo> classConfiguration)
+    private static void outputProvider(RegistrationOptions registrationOptions, ImmutableArray<INamedTypeSymbol> dbContexts, Action<string, ClassInfo> classConfiguration)
     {
         foreach (var dbContextSymbol in dbContexts)
         {

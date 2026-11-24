@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.PostgreSQL.Design;
+﻿using Basilisque.DataAccess.EntityFramework.PostgreSQL.Design;
 using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

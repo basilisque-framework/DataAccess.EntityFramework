@@ -18,7 +18,7 @@ using System.Collections.Immutable;
 
 namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeDbContextFactoryGenerator;
 
-internal struct DesignTimeDbContextFactoryGeneratorInfo
+internal readonly struct DesignTimeDbContextFactoryGeneratorInfo
 {
     public ImmutableArray<INamedTypeSymbol> DbContexts { get; }
 

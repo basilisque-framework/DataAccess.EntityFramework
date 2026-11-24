@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,6 +81,6 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()
     {
-        yield return ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory;
+        yield return _sqlServerDesignTimeFactoryAssembly;
     }
 }

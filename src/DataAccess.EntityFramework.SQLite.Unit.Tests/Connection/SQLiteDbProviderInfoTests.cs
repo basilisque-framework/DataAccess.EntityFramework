@@ -1,5 +1,5 @@
-/*
-   Copyright 2025 Alexander St�rk
+﻿/*
+   Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class SQLiteDbProviderInfoTests
     public async Task ProviderInfo_is_resolvable_and_has_expected_values()
     {
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>())
+            .AddInMemoryCollection([])
             .Build();
 
         var services = new ServiceCollection();

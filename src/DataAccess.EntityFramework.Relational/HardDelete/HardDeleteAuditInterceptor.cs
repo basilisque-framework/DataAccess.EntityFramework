@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.Stamping;
+﻿using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -15,13 +15,20 @@ namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 /// Must run after the soft-delete/stamping interceptor.
 /// </summary>
 [RegisterServiceScoped]
-public sealed class HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserProvider> userProviders) : SaveChangesInterceptor
+public sealed class HardDeleteAuditInterceptor : SaveChangesInterceptor
 {
-    private readonly Dictionary<Type, IHardDeleteAuditUserProvider> _users = userProviders
-        .GroupBy(provider => provider.UserKeyType).ToDictionary(group => group.Key, group => group.Last());
-    private readonly ConditionalWeakTable<DbContext, List<EntityEntry>> _pending = new();
+    private readonly Dictionary<Type, IHardDeleteAuditUserProvider> _users;
+    private readonly ConditionalWeakTable<DbContext, List<EntityEntry>> _pending = [];
     private static readonly MethodInfo _addMethod = typeof(HardDeleteAuditInterceptor)
         .GetMethod(nameof(add), BindingFlags.NonPublic | BindingFlags.Static)!;
+
+    /// <summary>Initializes the interceptor with the available audit user providers.</summary>
+    /// <param name="userProviders">The providers keyed by their user identifier type.</param>
+    public HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserProvider> userProviders)
+    {
+        _users = userProviders.GroupBy(provider => provider.UserKeyType)
+            .ToDictionary(group => group.Key, group => group.Last());
+    }
 
     /// <inheritdoc />
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -81,14 +88,18 @@ public sealed class HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserP
         var entries = context.ChangeTracker.Entries().ToArray();
         if (entries.Any(entry => (entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted) &&
             entry.Metadata.FindAnnotation(AuditMetadata.SourceEntity) is not null))
+        {
             throw new InvalidOperationException("Hard-delete audit events cannot be written through the ChangeTracker. They are generated only by physical deletions.");
+        }
 
         if (entries.Any(entry => entry.State == EntityState.Deleted &&
             entry.Metadata.FindAnnotation(AuditMetadata.AuditName) is null &&
             (entry.Metadata.FindAnnotation(AuditMetadata.Enabled)?.Value is true ||
              entry.Metadata.ClrType.GetInterfaces().Any(type => type.IsGenericType &&
                  type.GetGenericTypeDefinition() == typeof(IHardDeleteAudited<>)))))
+        {
             throw new InvalidOperationException("Hard-delete audit model configuration is missing. Install AddHardDeleteAuditConvention or apply the configurations after OnModelCreating.");
+        }
 
         if (context.ChangeTracker.CascadeDeleteTiming == CascadeTiming.OnSaveChanges ||
             context.ChangeTracker.DeleteOrphansTiming == CascadeTiming.OnSaveChanges)
@@ -107,7 +118,9 @@ public sealed class HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserP
             throw new InvalidOperationException("Hard-delete audit does not support ambient or enlisted transactions. Use an EF transaction with savepoints.");
         if (context.Database.CurrentTransaction is { } transaction &&
             (!context.Database.AutoSavepointsEnabled || !transaction.SupportsSavepoints))
+        {
             throw new InvalidOperationException("Hard-delete audit requires savepoints inside an existing transaction.");
+        }
 
         var pending = _pending.GetOrCreateValue(context);
         var timestamp = DateTimeOffset.UtcNow;
@@ -127,7 +140,9 @@ public sealed class HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserP
                 var members = (string[])source.Metadata.FindAnnotation(AuditMetadata.KeyMembers)!.Value!;
                 var values = new Dictionary<string, object?>
                 {
-                    ["AuditId"] = Guid.NewGuid(), ["DeletedAt"] = timestamp, ["DeletedBy"] = user
+                    ["AuditId"] = Guid.NewGuid(),
+                    ["DeletedAt"] = timestamp,
+                    ["DeletedBy"] = user
                 };
                 if (source.Metadata.FindAnnotation(AuditMetadata.KeyType)?.Value is Type keyType)
                 {
@@ -187,5 +202,4 @@ public sealed class HardDeleteAuditInterceptor(IEnumerable<IHardDeleteAuditUserP
             entry.State = EntityState.Detached;
         _pending.Remove(context);
     }
-
 }

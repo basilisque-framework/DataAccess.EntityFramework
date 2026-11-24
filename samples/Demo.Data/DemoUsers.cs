@@ -1,4 +1,4 @@
-namespace Basilisque.Demo.Data;
+﻿namespace Basilisque.Demo.Data;
 
 public static class DemoUsers
 {

@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ public static class MigrationAssemblyProviderGeneratorData
     /// <summary>
     /// The source code template for the generated migration assembly provider implementation.
     /// </summary>
-    private static readonly string MigrationAssemblyProviderSourceTemplate = $@"{CommonGeneratorData.GeneratedFileSharedHeaderWithNullable}
+    private static readonly string _migrationAssemblyProviderSourceTemplate = $@"{CommonGeneratorData.GeneratedFileSharedHeaderWithNullable}
 namespace __BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__;
 
 /// <summary>
@@ -66,7 +66,7 @@ __BASILISQUE_MIGRATION_MAPPINGS__
     /// <param name="mappings">The generated context/provider selection statements.</param>
     public static string GetMigrationAssemblyProviderSource(string @namespace, string mappings = "")
     {
-        return MigrationAssemblyProviderSourceTemplate.Replace("__BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__", @namespace)
+        return _migrationAssemblyProviderSourceTemplate.Replace("__BASILISQUE_MIGRATION_PROVIDER_NAMESPACE__", @namespace)
             .Replace("__BASILISQUE_MIGRATION_MAPPINGS__", mappings);
     }
 }

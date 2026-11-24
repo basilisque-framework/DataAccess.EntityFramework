@@ -1,4 +1,4 @@
-namespace Basilisque.Demo.Web.Services;
+﻿namespace Basilisque.Demo.Web.Services;
 
 /// <summary>Registers the sample and its provider dependencies.</summary>
 public static class DemoRegistration

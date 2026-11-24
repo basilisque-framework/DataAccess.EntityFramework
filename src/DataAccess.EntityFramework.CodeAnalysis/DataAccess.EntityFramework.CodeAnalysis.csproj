@@ -24,7 +24,7 @@
     <!-- ExtensionSupport already bundles the CodeAnalysis helper assembly. -->
     <BAS_CA_Dependency_PackCS>false</BAS_CA_Dependency_PackCS>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Basilisque.CodeAnalysis" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" />

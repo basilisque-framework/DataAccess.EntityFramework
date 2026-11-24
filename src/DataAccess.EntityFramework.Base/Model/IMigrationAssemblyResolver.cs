@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>Resolves migration assemblies without depending on registration order.</summary>
 [RegisterServiceSingleton(As = typeof(IMigrationAssemblyResolver), ImplementsITypeName = false)]

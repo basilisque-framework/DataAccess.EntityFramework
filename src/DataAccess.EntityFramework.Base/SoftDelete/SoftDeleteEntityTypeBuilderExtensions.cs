@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ public static class SoftDeleteEntityTypeBuilderExtensions
             where TUserKey : struct
         {
             builder.UseShadowSoftDeleteTimestamp();
-            SoftDeleteModelBuilderExtensions.configureUserProperty(builder.Property<TUserKey?>(nameof(ISoftDelete.DeletedBy)).Metadata);
+            SoftDeleteModelBuilderExtensions.ConfigureUserProperty(builder.Property<TUserKey?>(nameof(ISoftDelete.DeletedBy)).Metadata);
             return builder;
         }
 
@@ -55,7 +55,7 @@ public static class SoftDeleteEntityTypeBuilderExtensions
             where TUserKey : class
         {
             builder.UseShadowSoftDeleteTimestamp();
-            SoftDeleteModelBuilderExtensions.configureUserProperty(builder.Property<TUserKey>(nameof(ISoftDelete.DeletedBy)).Metadata);
+            SoftDeleteModelBuilderExtensions.ConfigureUserProperty(builder.Property<TUserKey>(nameof(ISoftDelete.DeletedBy)).Metadata);
             return builder;
         }
 
@@ -65,7 +65,7 @@ public static class SoftDeleteEntityTypeBuilderExtensions
         public EntityTypeBuilder<TEntity> UseShadowSoftDeleteTimestamp()
         {
             ArgumentNullException.ThrowIfNull(builder);
-            SoftDeleteModelBuilderExtensions.configureTimestampAndFilter(builder);
+            SoftDeleteModelBuilderExtensions.ConfigureTimestampAndFilter(builder);
             return builder;
         }
     }

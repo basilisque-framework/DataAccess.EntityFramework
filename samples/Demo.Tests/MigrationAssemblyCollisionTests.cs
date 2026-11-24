@@ -1,7 +1,6 @@
+﻿extern alias PostgreSQLMigrations;
 extern alias SQLiteMigrations;
 extern alias SqlServerMigrations;
-extern alias PostgreSQLMigrations;
-
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.Demo.Data;
 using Microsoft.EntityFrameworkCore;

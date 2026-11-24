@@ -1,4 +1,4 @@
-using Basilisque.Core.Auth;
+﻿using Basilisque.Core.Auth;
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
@@ -6,9 +6,9 @@ using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
-using Microsoft.Data.Sqlite;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Design;
@@ -106,14 +106,23 @@ public class HardDeleteAuditTests
     {
     }
 
-    private sealed class MissingConventionContext(DbContextOptions<MissingConventionContext> options) : DbContext(options)
+    private sealed class MissingConventionContext : DbContext
     {
+        public MissingConventionContext(DbContextOptions<MissingConventionContext> options)
+            : base(options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder builder) => builder.Entity<Document>();
     }
 
-    private sealed class AutoContext(IDbProviderServiceProvider provider) :
-        Basilisque.DataAccess.EntityFramework.Relational.Model.BaseDbContext<AutoContext>(provider)
+    private sealed class AutoContext : Basilisque.DataAccess.EntityFramework.Relational.Model.BaseDbContext<AutoContext>
     {
+        public AutoContext(IDbProviderServiceProvider provider)
+            : base(provider)
+        {
+        }
+
         protected override string? GetAppAreaPrefix() => "App";
 
         protected override void OnAfterModelCreating(ModelBuilder builder)
@@ -122,28 +131,47 @@ public class HardDeleteAuditTests
         }
     }
 
-    private sealed class Configurator(SqliteConnection connection) : IDbContextOptionsConfigurator
+    private sealed class Configurator : IDbContextOptionsConfigurator
     {
+        private readonly SqliteConnection _connection;
+
+        public Configurator(SqliteConnection connection)
+        {
+            _connection = connection;
+        }
+
         public void Configure<TDbContext>(BaseDbContext<TDbContext> context, DbContextOptionsBuilder builder)
-            where TDbContext : BaseDbContext<TDbContext> => builder.UseSqlite(connection);
+            where TDbContext : BaseDbContext<TDbContext> => builder.UseSqlite(_connection);
     }
 
-    private sealed class DesignFactory(SqliteConnection connection) : RelationalBaseDesignTimeDbContextFactory<AutoContext>
+    private sealed class DesignFactory : RelationalBaseDesignTimeDbContextFactory<AutoContext>
     {
-        protected override IConfiguration CreateConfiguration(IServiceProvider serviceProvider, string[] args) =>
-            new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["Database:Provider"] = "SQLite" }).Build();
+        private readonly SqliteConnection _connection;
+
+        public DesignFactory(SqliteConnection connection)
+        {
+            _connection = connection;
+        }
+
+        protected override IConfiguration CreateConfiguration(IServiceProvider serviceProvider, string[] args)
+            => new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["Database:Provider"] = "SQLite" }).Build();
 
         protected override void ConfigureServices(IServiceCollection services, string[] args)
         {
-            services.AddSingleton<IDbContextOptionsConfigurator>(new Configurator(connection));
+            services.AddSingleton<IDbContextOptionsConfigurator>(new Configurator(_connection));
             var info = Substitute.For<IDbProviderInfo>();
             info.ProviderKey.Returns("SQLite");
             services.AddSingleton(info);
         }
     }
 
-    public sealed class TestContext(DbContextOptions<TestContext> options) : DbContext(options)
+    public sealed class TestContext : DbContext
     {
+        public TestContext(DbContextOptions<TestContext> options)
+            : base(options)
+        {
+        }
+
         protected override void ConfigureConventions(ModelConfigurationBuilder builder)
         {
             builder.AddHardDeleteAuditConvention();
@@ -193,8 +221,8 @@ public class HardDeleteAuditTests
             context.Database.EnsureCreated();
         }
 
-        public void SetUser<T>(T user) where T : notnull =>
-            _scope.ServiceProvider.GetRequiredService<IWritableUserContext<T>>().UserId = user;
+        public void SetUser<T>(T user) where T : notnull
+            => _scope.ServiceProvider.GetRequiredService<IWritableUserContext<T>>().UserId = user;
 
         public TestContext CreateContext()
         {
@@ -349,8 +377,11 @@ public class HardDeleteAuditTests
         context.AddRange(first, second);
         await context.SaveChangesAsync();
         using (var other = database.CreateContext())
+        {
             await other.Set<Document>().Where(value => value.Id == second.Id).ExecuteUpdateAsync(
                 setters => setters.SetProperty(value => value.Version, 1));
+        }
+
         context.RemoveRange(first, second);
         await Assert.That(async () => await context.SaveChangesAsync()).Throws<DbUpdateConcurrencyException>();
         await Assert.That(await context.HardDeleteAudits<Document, Guid>().CountAsync()).IsEqualTo(0);

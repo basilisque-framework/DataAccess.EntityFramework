@@ -1,4 +1,4 @@
-using Basilisque.Core.Auth;
+﻿using Basilisque.Core.Auth;
 
 namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 
@@ -14,12 +14,21 @@ public interface IHardDeleteAuditUserProvider
 
 /// <summary>Uses the same Core user context as entity stamping.</summary>
 /// <typeparam name="TUser">The non-nullable user-key type.</typeparam>
-public sealed class HardDeleteAuditUserProvider<TUser>(IUserContext<TUser> userContext) : IHardDeleteAuditUserProvider
+public sealed class HardDeleteAuditUserProvider<TUser> : IHardDeleteAuditUserProvider
     where TUser : notnull
 {
+    private readonly IUserContext<TUser> _userContext;
+
+    /// <summary>Initializes a provider for the given user context.</summary>
+    /// <param name="userContext">The context used to resolve the current actor.</param>
+    public HardDeleteAuditUserProvider(IUserContext<TUser> userContext)
+    {
+        _userContext = userContext;
+    }
+
     /// <inheritdoc />
     public Type UserKeyType => typeof(TUser);
 
     /// <inheritdoc />
-    public object? GetCurrentUserId() => userContext.TryGetCurrentUserId(out var userId) ? userId : null;
+    public object? GetCurrentUserId() => _userContext.TryGetCurrentUserId(out var userId) ? userId : null;
 }

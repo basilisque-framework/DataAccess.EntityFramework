@@ -32,8 +32,8 @@ internal static class DesignTimeDbContextFactoryGeneratorSelectors
 
         var typeCollector = createTypeCollector(compilation, cancellationToken);
 
-        var dbContextsToGenerate = typeCollector?.GetDbContextImplementations() ?? ImmutableArray<INamedTypeSymbol>.Empty;
-        var designTimeFactoriesToGenerate = typeCollector?.GetDbContextDesignTimeFactories() ?? ImmutableArray<INamedTypeSymbol>.Empty;
+        var dbContextsToGenerate = typeCollector?.GetDbContextImplementations() ?? [];
+        var designTimeFactoriesToGenerate = typeCollector?.GetDbContextDesignTimeFactories() ?? [];
 
         return new DesignTimeDbContextFactoryGeneratorInfo(dbContextsToGenerate, designTimeFactoriesToGenerate);
     }

@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,14 +72,18 @@ internal static class SoftDeleteProcessor
             {
                 if (!softDeletes.Any(principal => references(entry, foreignKey, principal, originalValues: true) ||
                                                   references(entry, foreignKey, principal, originalValues: false)))
+                {
                     continue;
+                }
 
                 var wouldCascade = context.ChangeTracker.CascadeDeleteTiming != CascadeTiming.Never &&
                     foreignKey.DeleteBehavior is DeleteBehavior.Cascade or DeleteBehavior.ClientCascade or DeleteBehavior.SetNull or DeleteBehavior.ClientSetNull;
 
                 if (wouldCascade || entry.State == EntityState.Deleted ||
                     foreignKey.Properties.Any(property => entry.Property(property.Name).IsModified))
+                {
                     throw new InvalidOperationException($"Soft deletion of a principal would delete or change dependent entity '{entry.Metadata.Name}'. No automatic soft-delete cascade is supported. Configure the relationship with DeleteBehavior.ClientNoAction and handle dependent changes explicitly.");
+                }
             }
         }
 
@@ -94,7 +98,6 @@ internal static class SoftDeleteProcessor
             date.CurrentValue = previousDate ?? timestamp;
             date.IsModified = previousDate is null;
         }
-
     }
 
     private static bool references(EntityEntry dependent, IForeignKey foreignKey, EntityEntry principal, bool originalValues)

@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>Base class for generated, context-specific migration assembly mappings.</summary>
 public abstract class MigrationAssemblyProvider : IMigrationAssemblyProvider

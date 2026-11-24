@@ -26,7 +26,7 @@ public class DbProviderServiceProviderTests
     private class FooDefault : IFoo { public string Who => "default"; }
     private class FooSqlServer : IFoo { public string Who => "sqlserver"; }
 
-    private static (IConfiguration, ServiceProvider) Build(string? providerName, bool registerKeyed, bool registerDefault)
+    private static (IConfiguration, ServiceProvider) build(string? providerName, bool registerKeyed, bool registerDefault)
     {
         var cfg = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["Database:Provider"] = providerName })
@@ -44,7 +44,7 @@ public class DbProviderServiceProviderTests
     [Test]
     public async Task GetRequiredService_prefers_keyed_by_provider_name()
     {
-        var (cfg, sp) = Build("SqlServer", registerKeyed: true, registerDefault: true);
+        var (cfg, sp) = build("SqlServer", registerKeyed: true, registerDefault: true);
         var sut = new DbProviderServiceProvider(cfg, sp);
 
         var foo = sut.GetRequiredService<IFoo>();
@@ -55,7 +55,7 @@ public class DbProviderServiceProviderTests
     [Test]
     public async Task Falls_back_to_default_service_when_no_keyed_match()
     {
-        var (cfg, sp) = Build("Other", registerKeyed: false, registerDefault: true);
+        var (cfg, sp) = build("Other", registerKeyed: false, registerDefault: true);
         var sut = new DbProviderServiceProvider(cfg, sp);
 
         var foo = sut.GetRequiredService<IFoo>();
@@ -66,7 +66,7 @@ public class DbProviderServiceProviderTests
     [Test]
     public async Task Throws_when_no_provider_configured_and_no_default()
     {
-        var cfg = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>()).Build();
+        var cfg = new ConfigurationBuilder().AddInMemoryCollection([]).Build();
         var sp = new ServiceCollection().AddSingleton<IFoo, FooDefault>().BuildServiceProvider();
         var sut = new DbProviderServiceProvider(cfg, sp);
 

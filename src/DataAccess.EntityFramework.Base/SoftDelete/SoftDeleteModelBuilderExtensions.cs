@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,11 +42,11 @@ public static class SoftDeleteModelBuilderExtensions
         public void ApplySoftDeleteConfigurations()
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
-            applyConfigurations(modelBuilder.Model);
+            ApplyConfigurations(modelBuilder.Model);
         }
     }
 
-    internal static void applyConfigurations(IMutableModel model)
+    internal static void ApplyConfigurations(IMutableModel model)
     {
         foreach (var entityType in model.GetEntityTypes().OrderBy(type => type.BaseType is not null).ToArray())
         {
@@ -75,12 +75,14 @@ public static class SoftDeleteModelBuilderExtensions
     {
         if (!entityType.ClrType.GetInterfaces().Any(type => type.IsGenericType &&
             (type.GetGenericTypeDefinition() == typeof(ISoftDelete<>) || type.GetGenericTypeDefinition() == typeof(ISoftDeleteOfRef<>))))
+        {
             return;
+        }
 
-        configureUserProperty(getMappedProperty(entityType, nameof(ISoftDelete.DeletedBy)));
+        ConfigureUserProperty(getMappedProperty(entityType, nameof(ISoftDelete.DeletedBy)));
     }
 
-    internal static void configureTimestampAndFilter(EntityTypeBuilder builder)
+    internal static void ConfigureTimestampAndFilter(EntityTypeBuilder builder)
     {
         builder.Property<DateTimeOffset?>(nameof(ISoftDeleteTimestamp.DeletedAt));
         configureTimestampAndFilter(builder.Metadata);
@@ -125,7 +127,7 @@ public static class SoftDeleteModelBuilderExtensions
             entityType.SetQueryFilter(existing.IsAnonymous ? PreservedApplicationFilterName : existing.Key, existing.Expression);
     }
 
-    internal static void configureUserProperty(IMutableProperty property)
+    internal static void ConfigureUserProperty(IMutableProperty property)
     {
         if (property.ClrType.IsValueType && Nullable.GetUnderlyingType(property.ClrType) is null)
             throw new InvalidOperationException($"Soft-delete property '{property.DeclaringType.Name}.{property.Name}' must have a nullable user-key type.");

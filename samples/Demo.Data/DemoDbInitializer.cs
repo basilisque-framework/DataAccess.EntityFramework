@@ -1,4 +1,4 @@
-using Basilisque.Core.Auth;
+﻿using Basilisque.Core.Auth;
 using Basilisque.DataAccess.EntityFramework.Relational.Data;
 using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 using Microsoft.EntityFrameworkCore;

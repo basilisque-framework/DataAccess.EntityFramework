@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +19,19 @@ using System.Threading;
 
 namespace Basilisque.DataAccess.EntityFramework.Base.Design;
 
-internal sealed class DesignTimeServiceLifetime(ServiceProvider provider, AsyncServiceScope scope) : IDesignTimeServiceLifetime
+internal sealed class DesignTimeServiceLifetime : IDesignTimeServiceLifetime
 {
+    private readonly ServiceProvider _provider;
+    private readonly AsyncServiceScope _scope;
     private int _isDisposed;
 
-    public IServiceProvider ServiceProvider => scope.ServiceProvider;
+    public DesignTimeServiceLifetime(ServiceProvider provider, AsyncServiceScope scope)
+    {
+        _provider = provider;
+        _scope = scope;
+    }
+
+    public IServiceProvider ServiceProvider => _scope.ServiceProvider;
 
     public void Dispose()
     {
@@ -32,11 +40,11 @@ internal sealed class DesignTimeServiceLifetime(ServiceProvider provider, AsyncS
 
         try
         {
-            scope.Dispose();
+            _scope.Dispose();
         }
         finally
         {
-            provider.Dispose();
+            _provider.Dispose();
         }
     }
 
@@ -47,11 +55,11 @@ internal sealed class DesignTimeServiceLifetime(ServiceProvider provider, AsyncS
 
         try
         {
-            await scope.DisposeAsync().ConfigureAwait(false);
+            await _scope.DisposeAsync().ConfigureAwait(false);
         }
         finally
         {
-            await provider.DisposeAsync().ConfigureAwait(false);
+            await _provider.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

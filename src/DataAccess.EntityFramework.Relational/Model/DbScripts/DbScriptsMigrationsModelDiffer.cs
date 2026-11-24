@@ -155,7 +155,7 @@ public class DbScriptsMigrationsModelDiffer : MigrationsModelDiffer
     private List<DbScriptInfo> getDbScriptAnnotations(IRelationalModel? relationalModel)
     {
         if (relationalModel is null)
-            return new List<DbScriptInfo>();
+            return [];
 
         return relationalModel.Model.GetAnnotations()
             .Where(a => a.Name.StartsWith("BAS:DA:DbScript:", StringComparison.Ordinal) && a.Value is not null)

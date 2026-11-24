@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -102,6 +102,6 @@ public class MyDbContext : CustomBaseDbContext<MyDbContext>
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()
     {
-        yield return ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory;
+        yield return _sqlServerDesignTimeFactoryAssembly;
     }
 }

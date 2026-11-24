@@ -1,5 +1,5 @@
-/*
-   Copyright 2025 Alexander St�rk
+﻿/*
+   Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -48,8 +48,10 @@ public class BaseDbContextTests
 
         public T GetRequiredService<T>() where T : notnull
         {
-            if (typeof(T) == typeof(IDbProviderInfo)) return (T)ProviderInfo;
-            if (typeof(T) == typeof(IDbContextOptionsConfigurator)) return (T)Configurator;
+            if (typeof(T) == typeof(IDbProviderInfo))
+                return (T)ProviderInfo;
+            if (typeof(T) == typeof(IDbContextOptionsConfigurator))
+                return (T)Configurator;
             throw new NotSupportedException();
         }
         public T? GetService<T>() => default;

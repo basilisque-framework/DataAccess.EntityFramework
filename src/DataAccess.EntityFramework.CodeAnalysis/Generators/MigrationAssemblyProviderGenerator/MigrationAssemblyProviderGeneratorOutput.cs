@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,10 @@
 */
 
 using Basilisque.CodeAnalysis.Syntax;
+using Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
 using Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport.DependencyInjectionGenerator;
 
-namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
+namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.MigrationAssemblyProviderGenerator;
 
 internal static class MigrationAssemblyProviderGeneratorOutput
 {

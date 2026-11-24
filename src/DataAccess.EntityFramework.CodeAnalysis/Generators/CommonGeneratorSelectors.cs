@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators;
 
 internal class CommonGeneratorSelectors
 {
-    private static readonly char[] _dbContextFactoriesSeparators = new char[] { ',', ';' };
+    private static readonly char[] _dbContextFactoriesSeparators = [',', ';'];
 
     internal static BuildPropertyInfo BuildPropertiesSelector(AnalyzerConfigOptionsProvider provider, CancellationToken cancellationToken)
     {
@@ -34,7 +34,9 @@ internal class CommonGeneratorSelectors
                 isMigrationAssembly = false;
         }
         else
+        {
             isMigrationAssembly = false;
+        }
 
         string[]? dbContextFactories;
         if (provider.GlobalOptions.TryGetValue("build_property.BAS_DA_EF_DesignTimeDbContextFactories", out string? dbContextFactoriesString) && !string.IsNullOrWhiteSpace(dbContextFactoriesString))
@@ -42,7 +44,9 @@ internal class CommonGeneratorSelectors
             dbContextFactories = dbContextFactoriesString.Split(_dbContextFactoriesSeparators, System.StringSplitOptions.RemoveEmptyEntries);
         }
         else
+        {
             dbContextFactories = null;
+        }
 
         provider.GlobalOptions.TryGetValue("build_property.RootNamespace", out string? rootNamespace);
         provider.GlobalOptions.TryGetValue("build_property.AssemblyName", out string? assemblyName);

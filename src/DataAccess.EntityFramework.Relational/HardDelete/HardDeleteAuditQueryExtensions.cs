@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 

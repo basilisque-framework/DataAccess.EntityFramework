@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,10 +55,10 @@ public static class StampModelBuilderExtensions
     private static void configureUserProperties(ModelBuilder modelBuilder, Type clrType)
     {
         if (implementsGenericInterface(clrType, typeof(IStampCreateUser<>)))
-            configureProperty(modelBuilder, clrType, nameof(IStampCreateUser<Guid>.CreatedBy), StampPropertyKind.CreatedBy);
+            configureProperty(modelBuilder, clrType, nameof(IStampCreateUser<>.CreatedBy), StampPropertyKind.CreatedBy);
 
         if (implementsGenericInterface(clrType, typeof(IStampModifyUser<>)))
-            configureProperty(modelBuilder, clrType, nameof(IStampModifyUser<Guid>.ModifiedBy), StampPropertyKind.ModifiedBy);
+            configureProperty(modelBuilder, clrType, nameof(IStampModifyUser<>.ModifiedBy), StampPropertyKind.ModifiedBy);
     }
 
     private static void configureProperty(ModelBuilder modelBuilder, Type clrType, string propertyName, StampPropertyKind propertyKind)

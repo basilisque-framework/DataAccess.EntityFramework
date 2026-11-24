@@ -47,4 +47,3 @@ public class Generate_OtherExisting_Attribute : BaseDataAccessEntityFrameworkGen
         return base.GetExpectedAttributeSources(supportedAttributes);
     }
 }
-

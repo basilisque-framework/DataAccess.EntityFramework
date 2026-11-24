@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.Data;
+﻿using Basilisque.DataAccess.EntityFramework.Base.Data;
 using Basilisque.Demo.Web.Components;
 using Basilisque.Demo.Web.Services;
 using Microsoft.AspNetCore.Hosting;

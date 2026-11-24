@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
+﻿using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

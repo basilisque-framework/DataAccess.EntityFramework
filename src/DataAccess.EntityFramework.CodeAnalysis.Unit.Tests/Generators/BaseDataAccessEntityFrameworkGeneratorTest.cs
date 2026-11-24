@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,13 +49,13 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
 {
     public virtual Microsoft.CodeAnalysis.CSharp.LanguageVersion? LanguageVersion { get { return null; } }
 
-    protected static MetadataReference ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory<>).Assembly.Location);
-    protected static MetadataReference ReferenceAssembly_SQLiteBaseDesignTimeDbContextFactory = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory<>).Assembly.Location);
-    protected static MetadataReference ReferenceAssembly_PostgreSQLBaseDesignTimeDbContextFactory = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory<>).Assembly.Location);
-    protected static IReadOnlyList<MetadataReference> ReferenceAssemblies_AllBaseDesignTimeDbContextFactories = [
-        ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory,
-        ReferenceAssembly_SQLiteBaseDesignTimeDbContextFactory,
-        ReferenceAssembly_PostgreSQLBaseDesignTimeDbContextFactory
+    protected static MetadataReference _sqlServerDesignTimeFactoryAssembly = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory<>).Assembly.Location);
+    protected static MetadataReference _sqliteDesignTimeFactoryAssembly = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory<>).Assembly.Location);
+    protected static MetadataReference _postgreSqlDesignTimeFactoryAssembly = MetadataReference.CreateFromFile(typeof(Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory<>).Assembly.Location);
+    protected static IReadOnlyList<MetadataReference> _designTimeFactoryAssemblies = [
+        _sqlServerDesignTimeFactoryAssembly,
+        _sqliteDesignTimeFactoryAssembly,
+        _postgreSqlDesignTimeFactoryAssembly
         ];
 
     [Test]
@@ -126,8 +126,8 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
             verifier.TestState.AnalyzerConfigFiles.Add(file);
 
         //set the diagnostic options
-        foreach (var diagOp in GetDiagnosticOptions())
-            verifier.DiagnosticOptions.Add(diagOp.key, diagOp.value);
+        foreach (var (key, value) in GetDiagnosticOptions())
+            verifier.DiagnosticOptions.Add(key, value);
 
         foreach (var expDiag in GetExpectedDiagnostics(assemblyName, version))
             verifier.ExpectedDiagnostics.Add(expDiag);
@@ -297,11 +297,14 @@ public abstract class BaseDataAccessEntityFrameworkGeneratorTest<TGenerator, TVe
             .Distinct().OrderBy(name => name, StringComparer.Ordinal);
         var lines = new List<string>();
         foreach (var name in names)
-        foreach (var provider in new[] { "PostgreSQL", "SQLite", "SqlServer" })
         {
-            lines.Add($"        if (dbContextType == typeof(global::{name}) && databaseProvider == \"{provider}\")");
-            lines.Add("            return typeof(MigrationAssemblyProvider).Assembly.GetName().Name;");
+            foreach (var provider in new[] { "PostgreSQL", "SQLite", "SqlServer" })
+            {
+                lines.Add($"        if (dbContextType == typeof(global::{name}) && databaseProvider == \"{provider}\")");
+                lines.Add("            return typeof(MigrationAssemblyProvider).Assembly.GetName().Name;");
+            }
         }
+
         return string.Join("\r\n", lines);
     }
 

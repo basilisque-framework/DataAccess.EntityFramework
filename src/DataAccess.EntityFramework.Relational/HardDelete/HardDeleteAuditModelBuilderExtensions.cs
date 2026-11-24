@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -32,10 +32,10 @@ public static class HardDeleteAuditModelBuilderExtensions
     public static void ApplyHardDeleteAuditConfigurations(this ModelBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        applyConfigurations(builder.Model);
+        ApplyConfigurations(builder.Model);
     }
 
-    internal static void applyConfigurations(IMutableModel model)
+    internal static void ApplyConfigurations(IMutableModel model)
     {
         using var conventions = model.DelayConventions();
         foreach (var entity in model.GetEntityTypes().ToArray())
@@ -55,10 +55,15 @@ public static class HardDeleteAuditModelBuilderExtensions
                 ?? throw new InvalidOperationException($"Hard-delete audit requires a primary key on '{entity.Name}'.");
             if (entity.IsOwned() || entity.BaseType is not null || entity.GetDerivedTypes().Any() ||
                 entity.HasSharedClrType || entity.GetMappingFragments().Any() || entity.GetTableName() is null)
+            {
                 throw new InvalidOperationException($"Hard-delete audit requires a non-owned, non-shared, single-table entity without inheritance: '{entity.Name}'.");
+            }
+
             if (model.GetEntityTypes().Any(other => other != entity &&
                 other.GetTableName() == entity.GetTableName() && other.GetSchema() == entity.GetSchema()))
+            {
                 throw new InvalidOperationException($"Hard-delete audit does not support table sharing for '{entity.Name}'.");
+            }
 
             var actor = (Type?)entity.FindAnnotation(AuditMetadata.UserType)?.Value ??
                 markers.SingleOrDefault()?.GenericTypeArguments[0] ?? typeof(Guid);
@@ -99,7 +104,10 @@ public static class HardDeleteAuditModelBuilderExtensions
                 members = (string[]?)entity.FindAnnotation(AuditMetadata.KeyMembers)?.Value ?? [];
                 if (sources.Length != key.Properties.Count || !sources.ToHashSet().SetEquals(key.Properties.Select(property => property.Name)) ||
                     members.Length != sources.Length || complexKey.GetProperties().Count(property => property.GetMethod?.IsPublic is true) != members.Length)
+                {
                     throw new InvalidOperationException($"Map every primary-key component of '{entity.Name}' exactly once, and no additional key-object members.");
+                }
+
                 var complex = audit.AddComplexProperty(auditClrType.GetProperty("EntityKey")!, collection: false);
                 complex.IsNullable = false;
                 for (var index = 0; index < sources.Length; index++)
@@ -112,7 +120,7 @@ public static class HardDeleteAuditModelBuilderExtensions
             }
             else
             {
-                members = dynamicKey ? sources.Select(source => AuditMetadata.DynamicKeyPrefix + source).ToArray() : ["EntityKey"];
+                members = dynamicKey ? [.. sources.Select(source => AuditMetadata.DynamicKeyPrefix + source)] : ["EntityKey"];
                 for (var index = 0; index < sources.Length; index++)
                     copyKeyMapping(key.Properties[index], addProperty(audit, members[index], key.Properties[index].ClrType));
                 audit.AddIndex(members.Select(member => audit.FindProperty(member)!).ToArray());
@@ -158,6 +166,6 @@ internal sealed class HardDeleteAuditConvention : IModelFinalizingConvention
     {
         if (modelBuilder.Metadata is not IMutableModel model)
             throw new InvalidOperationException("Hard-delete audit requires a mutable model during finalization.");
-        HardDeleteAuditModelBuilderExtensions.applyConfigurations(model);
+        HardDeleteAuditModelBuilderExtensions.ApplyConfigurations(model);
     }
 }

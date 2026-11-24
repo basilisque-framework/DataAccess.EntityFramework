@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
+﻿namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 
 internal static class AuditMetadata
 {

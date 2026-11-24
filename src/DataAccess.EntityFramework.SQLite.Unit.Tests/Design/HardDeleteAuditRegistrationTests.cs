@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
+﻿using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 using Basilisque.DataAccess.EntityFramework.SQLite.Design;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

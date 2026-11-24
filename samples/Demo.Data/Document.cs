@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
+﻿using Basilisque.DataAccess.EntityFramework.Base.SoftDelete;
 using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ public partial class MyDbContextDesignTimeFactory : global::Basilisque.DataAcces
     private global::Basilisque.DataAccess.EntityFramework.PostgreSQL.Design.PostgreSQLBaseDesignTimeDbContextFactory<DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext> _designTimeFactory1 = new();
     private global::Basilisque.DataAccess.EntityFramework.SQLite.Design.SQLiteBaseDesignTimeDbContextFactory<DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext> _designTimeFactory2 = new();
     private global::Basilisque.DataAccess.EntityFramework.SqlServer.Design.SqlServerBaseDesignTimeDbContextFactory<DbContextAssembly.DataAccess.EFG.TestObjects.Generate_1_DbContext.MyDbContext> _designTimeFactory3 = new();
-    
+{"    "}
     /// <inheritdoc />
     public sealed override void ConfigureProviderServices(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services, string[] args, bool isChildFactory)
     {{
@@ -45,7 +45,7 @@ public partial class MyDbContextDesignTimeFactory : global::Basilisque.DataAcces
         _designTimeFactory2.ConfigureProviderServices(services, args, isChildFactory: true);
         _designTimeFactory3.ConfigureProviderServices(services, args, isChildFactory: true);
     }}
-    
+{"    "}
     /// <inheritdoc />
     protected sealed override void ConfigureMigrationAssemblyProvider(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services, string[] args)
     {{
@@ -95,6 +95,6 @@ public class MyDbContext : BaseDbContext<MyDbContext>
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()
     {
-        return ReferenceAssemblies_AllBaseDesignTimeDbContextFactories;
+        return _designTimeFactoryAssemblies;
     }
 }

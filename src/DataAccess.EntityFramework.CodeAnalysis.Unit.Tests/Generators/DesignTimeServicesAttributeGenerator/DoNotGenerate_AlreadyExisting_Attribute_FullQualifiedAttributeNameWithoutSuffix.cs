@@ -47,4 +47,3 @@ public class DoNotGenerate_AlreadyExisting_Attribute_FullQualifiedAttributeNameW
         yield break;
     }
 }
-

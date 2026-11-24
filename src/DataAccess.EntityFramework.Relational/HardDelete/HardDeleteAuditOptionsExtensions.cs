@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.Stamping;
+﻿using Basilisque.DataAccess.EntityFramework.Base.Stamping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

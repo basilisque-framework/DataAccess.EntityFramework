@@ -1,6 +1,6 @@
+﻿using Basilisque.DataAccess.EntityFramework.Base.Data;
 using Basilisque.Demo.Data;
 using Basilisque.Demo.Web.Services;
-using Basilisque.DataAccess.EntityFramework.Base.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;

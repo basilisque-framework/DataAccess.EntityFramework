@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
+﻿using Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

@@ -67,7 +67,7 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
 
     protected override IEnumerable<MetadataReference> GetMigrationAssemblyReferences()
     {
-        yield return ReferenceAssembly_SqlServerBaseDesignTimeDbContextFactory;
+        yield return _sqlServerDesignTimeFactoryAssembly;
     }
 
     protected override IEnumerable<(string Name, string SourceText)> GetExpectedDbContextFactorySources()
@@ -105,4 +105,3 @@ public class MyDbContext : Basilisque.DataAccess.EntityFramework.Relational.Mode
         }
     }
 }
-

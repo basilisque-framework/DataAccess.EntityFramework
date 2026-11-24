@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2025-2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -273,9 +273,7 @@ public abstract class BaseDbContext<TDbContext> : DbContext, IInitializableDbCon
 
         var invalidChars = System.IO.Path.GetInvalidPathChars();
 
-        var cleaned = new string(name
-            .Select(ch => invalidChars.Contains(ch) ? replacementChar : ch)
-            .ToArray());
+        var cleaned = new string([.. name.Select(ch => invalidChars.Contains(ch) ? replacementChar : ch)]);
 
         cleaned = cleaned.Trim(' ', '.');
 

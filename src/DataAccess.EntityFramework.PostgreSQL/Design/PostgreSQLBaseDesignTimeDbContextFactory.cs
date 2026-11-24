@@ -17,9 +17,9 @@
 using Basilisque.DataAccess.EntityFramework.Base.Connection;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Basilisque.DataAccess.EntityFramework.Base.Provider;
-using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Basilisque.DataAccess.EntityFramework.PostgreSQL.Connection;
 using Basilisque.DataAccess.EntityFramework.PostgreSQL.Model;
+using Basilisque.DataAccess.EntityFramework.Relational.Design;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Basilisque.DataAccess.EntityFramework.PostgreSQL.Design;

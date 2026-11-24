@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -173,8 +173,13 @@ public class SoftDeleteTests
         public long? DeletedBy { get; set; }
     }
 
-    private sealed class TestContext(IDbProviderServiceProvider serviceProvider) : BaseDbContext<TestContext>(serviceProvider)
+    private sealed class TestContext : BaseDbContext<TestContext>
     {
+        public TestContext(IDbProviderServiceProvider serviceProvider)
+            : base(serviceProvider)
+        {
+        }
+
         public int TenantId { get; set; } = 1;
         public DbSet<Document> Documents => Set<Document>();
         public DbSet<StringDocument> Strings => Set<StringDocument>();
@@ -208,17 +213,29 @@ public class SoftDeleteTests
         }
     }
 
-    private sealed class SqliteConfigurator(SqliteConnection connection) : IDbContextOptionsConfigurator
+    private sealed class SqliteConfigurator : IDbContextOptionsConfigurator
     {
+        private readonly SqliteConnection _connection;
+
+        public SqliteConfigurator(SqliteConnection connection)
+        {
+            _connection = connection;
+        }
+
         public void Configure<TDbContext>(BaseDbContext<TDbContext> context, DbContextOptionsBuilder optionsBuilder)
             where TDbContext : BaseDbContext<TDbContext>
         {
-            optionsBuilder.UseSqlite(connection);
+            optionsBuilder.UseSqlite(_connection);
         }
     }
 
-    private sealed class StandaloneContext(DbContextOptions<StandaloneContext> options) : DbContext(options)
+    private sealed class StandaloneContext : DbContext
     {
+        public StandaloneContext(DbContextOptions<StandaloneContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<StringDocument> Documents => Set<StringDocument>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -227,8 +244,13 @@ public class SoftDeleteTests
         }
     }
 
-    private sealed class SpecialKeyContext(DbContextOptions<SpecialKeyContext> options) : DbContext(options)
+    private sealed class SpecialKeyContext : DbContext
     {
+        public SpecialKeyContext(DbContextOptions<SpecialKeyContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<SpecialKeyDocument> Documents => Set<SpecialKeyDocument>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -237,8 +259,15 @@ public class SoftDeleteTests
         }
     }
 
-    private sealed class DesignTimeFactory(SqliteConnection connection) : BaseDesignTimeDbContextFactory<TestContext>
+    private sealed class DesignTimeFactory : BaseDesignTimeDbContextFactory<TestContext>
     {
+        private readonly SqliteConnection _connection;
+
+        public DesignTimeFactory(SqliteConnection connection)
+        {
+            _connection = connection;
+        }
+
         protected override IConfiguration CreateConfiguration(IServiceProvider serviceProvider, string[] args)
         {
             return new ConfigurationBuilder().AddInMemoryCollection(
@@ -247,7 +276,7 @@ public class SoftDeleteTests
 
         protected override void ConfigureServices(IServiceCollection services, string[] args)
         {
-            services.AddSingleton<IDbContextOptionsConfigurator>(new SqliteConfigurator(connection));
+            services.AddSingleton<IDbContextOptionsConfigurator>(new SqliteConfigurator(_connection));
             var info = Substitute.For<IDbProviderInfo>();
             info.ProviderKey.Returns("SQLite");
             info.ProviderName.Returns("SQLite");
@@ -812,14 +841,19 @@ public class SoftDeleteTests
         var fixedUser = Guid.NewGuid();
         var document = new Document
         {
-            DeletedAt = fixedTime, DeletedBy = fixedUser,
-            CreatedAt = fixedTime, CreatedBy = fixedUser,
-            ModifiedAt = fixedTime, ModifiedBy = fixedUser
+            DeletedAt = fixedTime,
+            DeletedBy = fixedUser,
+            CreatedAt = fixedTime,
+            CreatedBy = fixedUser,
+            ModifiedAt = fixedTime,
+            ModifiedBy = fixedUser
         };
         var activeDocument = new Document
         {
-            CreatedAt = fixedTime, CreatedBy = fixedUser,
-            ModifiedAt = fixedTime, ModifiedBy = fixedUser
+            CreatedAt = fixedTime,
+            CreatedBy = fixedUser,
+            ModifiedAt = fixedTime,
+            ModifiedBy = fixedUser
         };
         context.AddRange(document, activeDocument);
         await context.SaveChangesAsync();
@@ -884,8 +918,10 @@ public class SoftDeleteTests
         using var database = new Database(services =>
         {
             if (registerHandler)
+            {
                 services.AddScoped<IUserStampHandler>(sp =>
                     new UserStampHandler<decimal>(sp.GetRequiredService<IUserContext<decimal>>()));
+            }
         });
         using var scope = database.CreateScope();
         scope.ServiceProvider.GetRequiredService<IWritableUserContext<decimal>>().UserId = 123m;

@@ -44,4 +44,3 @@ public class Generate_NonExisting_Attribute : BaseDataAccessEntityFrameworkGener
         return base.GetExpectedAttributeSources(supportedAttributes);
     }
 }
-

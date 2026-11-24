@@ -1,4 +1,4 @@
-using Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;

@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
+﻿namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 
 /// <summary>
 /// A physical deletion event with a typed entity key and actor.

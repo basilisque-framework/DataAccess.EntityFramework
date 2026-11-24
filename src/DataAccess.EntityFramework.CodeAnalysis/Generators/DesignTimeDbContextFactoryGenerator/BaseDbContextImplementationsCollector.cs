@@ -21,8 +21,8 @@ namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTi
 
 internal class BaseDbContextImplementationsCollector : SymbolVisitor
 {
-    private readonly HashSet<INamedTypeSymbol> _foundDbContextTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-    private readonly HashSet<INamedTypeSymbol> _foundDbContextDesignTimeFactoryTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+    private readonly HashSet<INamedTypeSymbol> _foundDbContextTypes = new(SymbolEqualityComparer.Default);
+    private readonly HashSet<INamedTypeSymbol> _foundDbContextDesignTimeFactoryTypes = new(SymbolEqualityComparer.Default);
     private readonly INamedTypeSymbol _baseDbContextType;
     private readonly INamedTypeSymbol _baseDbContextDesignTimeFactoryType;
     private readonly CancellationToken _cancellationToken;
@@ -34,9 +34,9 @@ internal class BaseDbContextImplementationsCollector : SymbolVisitor
         _baseDbContextDesignTimeFactoryType = baseDbContextDesignTimeFactoryType;
     }
 
-    public ImmutableArray<INamedTypeSymbol> GetDbContextImplementations() => _foundDbContextTypes.ToImmutableArray();
+    public ImmutableArray<INamedTypeSymbol> GetDbContextImplementations() => [.. _foundDbContextTypes];
 
-    public ImmutableArray<INamedTypeSymbol> GetDbContextDesignTimeFactories() => _foundDbContextDesignTimeFactoryTypes.ToImmutableArray();
+    public ImmutableArray<INamedTypeSymbol> GetDbContextDesignTimeFactories() => [.. _foundDbContextDesignTimeFactoryTypes];
 
     public override void VisitAssembly(IAssemblySymbol symbol)
     {
@@ -86,7 +86,9 @@ internal class BaseDbContextImplementationsCollector : SymbolVisitor
                 return;
         }
         else
+        {
             return;
+        }
 
         var nestedTypes = type.GetTypeMembers();
         if (nestedTypes.IsDefaultOrEmpty)

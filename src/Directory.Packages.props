@@ -20,12 +20,12 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-  
+
   <!-- define NuGet package versions -->
   <ItemGroup>
     <!-- workaround for https://github.com/dotnet/SqlClient/issues/4843 -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
-    
+
     <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.1-Preview00001" />
     <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.1-Preview00001" />
     <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-Preview00012" />
@@ -48,7 +48,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="GitVersion.MsBuild" Version="6.8.2" />
   </ItemGroup>
-  
+
   <!-- Common Packages -->
   <ItemGroup>
     <PackageReference Include="Basilisque.CommonFrameworkBuild">
@@ -64,7 +64,7 @@
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.CodeAnalysis')) != 'true'">
     <PackageReference Include="Basilisque.DependencyInjection" />
   </ItemGroup>
-  
+
   <!-- Common Usings -->
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.CodeAnalysis')) != 'true'">
     <Using Include="Basilisque.DependencyInjection.Registration.Annotations" />

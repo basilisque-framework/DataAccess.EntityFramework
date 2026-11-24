@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
+﻿namespace Basilisque.DataAccess.EntityFramework.Relational.HardDelete;
 
 /// <summary>
 /// Enables hard-delete auditing with a nullable Guid actor and inferred primary key.

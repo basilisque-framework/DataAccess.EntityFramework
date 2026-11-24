@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>An explicit migration assembly selection for one context/provider pair.</summary>
 /// <param name="DbContextType">The concrete context type.</param>

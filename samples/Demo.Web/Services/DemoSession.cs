@@ -1,4 +1,4 @@
-using Basilisque.Core.Auth;
+﻿using Basilisque.Core.Auth;
 using Basilisque.Demo.Data;
 
 namespace Basilisque.Demo.Web.Services;

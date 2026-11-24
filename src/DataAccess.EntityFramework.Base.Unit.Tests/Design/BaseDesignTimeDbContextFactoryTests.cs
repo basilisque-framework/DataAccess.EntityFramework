@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.DependencyInjection;
+using Basilisque.DataAccess.EntityFramework.Base.Design;
 using Basilisque.DataAccess.EntityFramework.Base.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

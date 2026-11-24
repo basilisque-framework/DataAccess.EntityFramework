@@ -16,7 +16,7 @@
 
 using System.Threading;
 
-namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.DesignTimeServicesAttributeGenerator;
+namespace Basilisque.DataAccess.EntityFramework.CodeAnalysis.Generators.MigrationAssemblyProviderGenerator;
 
 internal static class MigrationAssemblyProviderGeneratorSelectors
 {

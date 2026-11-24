@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,8 @@ namespace Basilisque.DataAccess.EntityFramework.Base.Stamping;
 
 internal sealed class UserStampDispatcher : IStampHandler
 {
-    private static readonly ConditionalWeakTable<IModel, Type[]> _keyTypes = new();
-    private readonly Dictionary<Type, IUserStampHandler> _handlers = new();
+    private static readonly ConditionalWeakTable<IModel, Type[]> _keyTypes = [];
+    private readonly Dictionary<Type, IUserStampHandler> _handlers = [];
 
     public UserStampDispatcher(IEnumerable<IUserStampHandler> handlers)
     {
@@ -37,13 +37,12 @@ internal sealed class UserStampDispatcher : IStampHandler
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var keyTypes = _keyTypes.GetValue(context.Model, static model => model.GetEntityTypes()
+        var keyTypes = _keyTypes.GetValue(context.Model, static model => [.. model.GetEntityTypes()
             .SelectMany(entityType => entityType.GetProperties())
             .Where(property => property.GetStampPropertyKind() is StampPropertyKind.CreatedBy or StampPropertyKind.ModifiedBy or StampPropertyKind.DeletedBy)
             .Select(property => (property.GetStampPropertyKind() == StampPropertyKind.DeletedBy
                 ? Nullable.GetUnderlyingType(property.ClrType) : null) ?? property.ClrType)
-            .Distinct()
-            .ToArray());
+            .Distinct()]);
 
         foreach (var keyType in keyTypes)
         {

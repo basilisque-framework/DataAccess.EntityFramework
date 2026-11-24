@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <summary>
 /// Provides an assembly name for a specific context and database provider.

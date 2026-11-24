@@ -1,5 +1,5 @@
-/*
-   Copyright 2025 Alexander St�rk
+﻿/*
+   Copyright 2025 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class PostgreSQLBaseDesignTimeDbContextFactoryTests
     public async Task ConfigureProviderServices_registers_keyed_services()
     {
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>())
+            .AddInMemoryCollection([])
             .Build();
 
         var services = new ServiceCollection();

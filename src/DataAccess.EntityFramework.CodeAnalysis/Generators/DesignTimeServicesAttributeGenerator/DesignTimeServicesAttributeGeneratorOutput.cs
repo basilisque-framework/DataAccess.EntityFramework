@@ -36,4 +36,3 @@ internal static class DesignTimeServicesAttributeGeneratorOutput
         }
     }
 }
-

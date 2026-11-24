@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2026 Alexander Stärk
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,6 @@ internal sealed class SoftDeleteConvention : IModelFinalizingConvention
         if (modelBuilder.Metadata is not IMutableModel model)
             throw new InvalidOperationException("Soft-delete configuration requires a mutable model during model finalization.");
 
-        SoftDeleteModelBuilderExtensions.applyConfigurations(model);
+        SoftDeleteModelBuilderExtensions.ApplyConfigurations(model);
     }
 }

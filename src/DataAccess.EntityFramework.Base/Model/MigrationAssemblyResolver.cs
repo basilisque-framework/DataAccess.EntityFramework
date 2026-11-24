@@ -1,4 +1,4 @@
-namespace Basilisque.DataAccess.EntityFramework.Base.Model;
+﻿namespace Basilisque.DataAccess.EntityFramework.Base.Model;
 
 /// <inheritdoc />
 public sealed class MigrationAssemblyResolver : IMigrationAssemblyResolver
@@ -13,8 +13,8 @@ public sealed class MigrationAssemblyResolver : IMigrationAssemblyResolver
     {
         ArgumentNullException.ThrowIfNull(providers);
         ArgumentNullException.ThrowIfNull(overrides);
-        _providers = providers.ToArray();
-        _overrides = overrides.ToArray();
+        _providers = [.. providers];
+        _overrides = [.. overrides];
     }
 
     /// <inheritdoc />
@@ -26,10 +26,10 @@ public sealed class MigrationAssemblyResolver : IMigrationAssemblyResolver
         var explicitNames = _overrides
             .Where(item => item.DbContextType == dbContextType && item.DatabaseProvider == databaseProvider)
             .Select(item => item.AssemblyName).Distinct(StringComparer.Ordinal).ToArray();
-        var names = explicitNames.Length > 0 ? explicitNames : _providers
+        var names = explicitNames.Length > 0 ? explicitNames : [.. _providers
             .Select(item => item.GetMigrationAssemblyName(dbContextType, databaseProvider))
             .Where(name => !string.IsNullOrWhiteSpace(name)).Cast<string>()
-            .Distinct(StringComparer.Ordinal).ToArray();
+            .Distinct(StringComparer.Ordinal)];
 
         if (names.Length > 1)
             throw new InvalidOperationException($"Multiple migration assemblies match context '{dbContextType.FullName}' and provider '{databaseProvider}': {string.Join(", ", names.OrderBy(name => name, StringComparer.Ordinal))}. Register one explicit selection with AddMigrationAssembly<TDbContext>().");
