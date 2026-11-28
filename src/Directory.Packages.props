@@ -39,7 +39,7 @@
   <ItemGroup>
     <PackageVersion Include="Basilisque.CodeAnalysis" Version="1.0.1-RC00006" />
     <PackageVersion Include="Basilisque.CodeAnalysis.TestSupport" Version="1.0.1-RC00006" />
-    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0-RC00015" />
+    <PackageVersion Include="Basilisque.CommonFrameworkBuild" Version="2.0.0" />
     <PackageVersion Include="Basilisque.Core" Version="1.0.0-RC00004" />
     <PackageVersion Include="Basilisque.DependencyInjection" Version="1.1.0-RC00026" />
     <PackageVersion Include="Basilisque.DependencyInjection.CodeAnalysis.ExtensionSupport" Version="1.1.0-RC00026" />
